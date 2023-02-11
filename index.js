@@ -3,9 +3,11 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const morgan = require("morgan");
+const userRoute = require('./Routes/userRoute');
 
 app.use(cors()); // for corss platform use of api
-app.use(express.json()) // for paresing the body parameters. 
+app.use(express.json()) // for paresing the body parameters.
+app.use('/api/v1/user',userRoute); 
 
 
 if(process.env.NODE_ENV=="development"){

@@ -23,10 +23,16 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  confirm_password: {
-    type: DataTypes.STRING,
-    allowNull: false
+  createdAt: {
+    type: "TIMESTAMP",
+    defaultValue: db.Sequelize.literal("CURRENT_TIMESTAMP"),
+    allowNull: false,
+  },
+  updatedAt: {
+    type: "TIMESTAMP",
+    defaultValue: db.Sequelize.literal("CURRENT_TIMESTAMP"),
+    allowNull: false,
   }
-});
+}, {timestamps: false,});
 
 module.exports = User;
