@@ -18,7 +18,17 @@ const Posts = sequelize.define('Posts', {
     user_id: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    createdAt: {
+      type: "TIMESTAMP",
+      defaultValue: db.Sequelize.literal("CURRENT_TIMESTAMP"),
+      allowNull: false,
+    },
+    updatedAt: {
+      type: "TIMESTAMP",
+      defaultValue: db.Sequelize.literal("CURRENT_TIMESTAMP"),
+      allowNull: false,
     }
-});
+  }, {timestamps: false,});
 
 module.exports = Posts;

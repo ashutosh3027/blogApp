@@ -18,7 +18,12 @@ const Follows = sequelize.define('Follows',{
     },
     status: {
         type: DataTypes.BOOLEAN,
+    },
+    createdAt: {
+      type: "TIMESTAMP",
+      defaultValue: db.Sequelize.literal("CURRENT_TIMESTAMP"),
+      allowNull: false,
     }
-});
+  }, {timestamps: false,});
 
 module.exports = Follows;

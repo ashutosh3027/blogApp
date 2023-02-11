@@ -15,7 +15,12 @@ const Likes = sequelize.define('Likes', {
     post_id: {
         type: DataTypes.INTEGER,
         allowNull: false
+    },
+    createdAt: {
+      type: "TIMESTAMP",
+      defaultValue: db.Sequelize.literal("CURRENT_TIMESTAMP"),
+      allowNull: false,
     }
-});
+  }, {timestamps: false,});
 
 module.exports = Likes;

@@ -109,7 +109,7 @@ const initialize = async () => {
         db.Likes = Likes;
         db.Follows = Follows;
         db.Comments = Comments;
-    })
+    });
 }
 
 initialize();
