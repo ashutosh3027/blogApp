@@ -3,7 +3,7 @@ module.exports={
         "host":"localhost",
         "port":3306,
         "user":"root",
-        "password":"indigoleague",
+        "password":process.env.PASSWORD,
         "database":"blogApp"
     },
     "pool":{

@@ -1,36 +1,10 @@
 const db = require('../utils/db');
 const { hashPassword, compare } = require('../utils/hashPass');
-
-const checkEmail = async (email, res) => {
-    try {
-        const check = await db.User.findAll({ where: { email } });
-        return check;
-    } catch (err) {
-        console.log(err);
-        res.status(404).json({
-            status: 'Email Check Error 2',
-        });
-        return 'error';
-    }
-};
+const jwt = require('jsonwebtoken');
 
 const signup = async (req, res) => {
     // console.log(typeof User.findOne);
     const { fullname, email, password } = req.body;
-    try {
-        const check = await checkEmail(email, res);
-        if (check === 'error') return;
-        if (check.length !== 0) {
-            return res.status(404).json({
-                status: 'Email Already in use',
-            });
-        }
-    } catch (err) {
-        console.log(err);
-        return res.status(404).json({
-            status: 'Email Check Error 1',
-        });
-    }
     try {
         const hash = await hashPassword(password);
         const newUser = await db.User.create({
@@ -52,7 +26,7 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await checkEmail(email, res);
+        const user = await db.User.findAll({ where: { email } });
         if(user.length===0){
             return res.status(404).json({
                 status: 'incorrect email'
@@ -60,8 +34,14 @@ const login = async (req, res) => {
         }
         const check = await compare(password, user[0].password);
         if(check){
+            const access_token = jwt.sign({user:user[0]},process.env.SECRET_ACCESS_TOKEN);
+            res.cookie("jwt",access_token,{
+                expires: new Date(Date.now() + 172800000),
+                httponly: true
+            });
             return res.status(200).json({
-                status: 'success, user authenticated'
+                status: 'success, user authenticated',
+                access_token,
             });
         }else{
             return res.status(404).json({
@@ -69,6 +49,7 @@ const login = async (req, res) => {
             });
         }
     } catch (err) {
+        console.log(err);
         return res.status(404).json({
             status: 'login catch error'
         });
@@ -77,12 +58,29 @@ const login = async (req, res) => {
 
 const deleteUser = async (req,res) => {
     try{
-        const {email} = req.body;
-        await db.User.destroy({where:{email}});
-        return res.status(200).json({
-            status: 'success, user deleted'
+        const {password} = req.body;
+        let hashPass = "",email = "";
+        const token = req.body.cookie.jwt;      // need to change it
+        jwt.verify(token,process.env.SECRET_ACCESS_TOKEN,(err,user)=>{
+            if(err)return res.status(403).json({
+                status: 'forbidden'
+            });
+            hashPass = user.user.password;
+            email = user.user.email;
         });
+        const check = await compare(password,hashPass);
+        if(check){
+            await db.User.destroy({where:{email}});
+            return res.status(200).json({
+                status: 'success, user deleted'
+            });
+        }else{
+            return res.status(404).json({
+                status: 'invalid password'
+            });
+        }
     }catch(err){
+        console.log(err);
         return res.status(404).json({
             status: 'deleteUser catch error'
         });
@@ -92,8 +90,15 @@ const deleteUser = async (req,res) => {
 const changePassword = async (req,res) => {
     try{
         const {email,oldpass,newpass} = req.body;
-        const hashpass = await db.User.findOne({attributes:['password'],where:{email}});
-        const check = await compare(oldpass,hashpass.password);
+        const token = req.body.cookie.jwt;                // need to change this while doing frontend
+        let hashpass = "";
+        jwt.verify(token,process.env.SECRET_ACCESS_TOKEN,(err,user)=>{
+            if(err)return res.status(403).json({
+                status: 'forbidden'
+            });
+            hashpass = user.user.password;
+        });
+        const check = await compare(oldpass,hashpass);
         if(!check){
             return res.status(404).json({
                 status: 'Old Password is Incorrect'
@@ -101,8 +106,15 @@ const changePassword = async (req,res) => {
         }
         const newhash = await hashPassword(newpass);
         await db.User.update({password:newhash,updatedAt:db.Sequelize.literal("CURRENT_TIMESTAMP")},{where:{email}});
+        const user = await db.User.findAll({ where: { email } });
+        const access_token = jwt.sign({user:user[0]},process.env.SECRET_ACCESS_TOKEN);
+            res.cookie("jwt",access_token,{
+                expires: new Date(Date.now() + 172800000),
+                httponly: true
+            });
         return res.status(200).json({
-            status: 'success, password changed'
+            status: 'success, password changed',
+            access_token
         });
     }catch(err){
         console.log(err);
