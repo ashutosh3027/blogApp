@@ -2,7 +2,8 @@ const db = require('../utils/db');
 
 const newReply = async (req,res)=>{
     try{
-        const {message,user_id,comment_id}=req.body;
+        const {message,comment_id}=req.body;
+        const user_id = req.body.user.id;
         const newreply = await db.Replies.create({
             message,user_id,comment_id
         });console.log(newreply);
@@ -20,6 +21,13 @@ const newReply = async (req,res)=>{
 const editReply = async (req,res)=>{
     try{
         const {id,message}=req.body;
+        const user_id = req.body.user.id;
+        const replies = await db.Replies.findAll({where:{id}});
+        if(replies[0].user_id!==user_id){
+            return res.status(404).json({
+                status: "Unauthorized"
+            });
+        }
         await db.Replies.update({ message, updatedAt: db.Sequelize.literal("CURRENT_TIMESTAMP") },{where:{id}});
         res.status(200).json({
             stauts: 'success, Reply edited',

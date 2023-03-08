@@ -4,8 +4,14 @@ const jwt = require('jsonwebtoken');
 
 const signup = async (req, res) => {
     // console.log(typeof User.findOne);
-    const { fullname, email, password } = req.body;
     try {
+        const { fullname, email, password } = req.body;
+        const user = await db.User.findAll({ where: { email } });
+        if(user.length!==0){
+            return res.status(404).json({
+                status: 'Email ALready Exists'
+            });
+        }
         const hash = await hashPassword(password);
         const newUser = await db.User.create({
             fullname: fullname,
@@ -13,13 +19,16 @@ const signup = async (req, res) => {
             password: hash
         });
         console.log(newUser);
-        return res.status(200).json({
+        res.status(200).json({
             status: 'success'
         });
+        return;
     } catch (err) {
-        return res.status(404).json({
+        console.log("test:",err);
+        res.status(404).json({
             status: 'Signup Error'
         });
+        return;
     }
 };
 
@@ -59,18 +68,15 @@ const login = async (req, res) => {
 const deleteUser = async (req,res) => {
     try{
         const {password} = req.body;
-        let hashPass = "",email = "";
-        const token = req.body.cookie.jwt;      // need to change it
-        jwt.verify(token,process.env.SECRET_ACCESS_TOKEN,(err,user)=>{
-            if(err)return res.status(403).json({
-                status: 'forbidden'
-            });
-            hashPass = user.user.password;
-            email = user.user.email;
-        });
-        const check = await compare(password,hashPass);
+        const {email} = req.body.user;
+        const hashpass = req.body.user.password;
+        const check = await compare(password,hashpass);
         if(check){
             await db.User.destroy({where:{email}});
+            res.cookie("jwt",null,{
+                expires: Date.now(),
+                httponly: true
+            });
             return res.status(200).json({
                 status: 'success, user deleted'
             });
@@ -89,15 +95,9 @@ const deleteUser = async (req,res) => {
 
 const changePassword = async (req,res) => {
     try{
-        const {email,oldpass,newpass} = req.body;
-        const token = req.body.cookie.jwt;                // need to change this while doing frontend
-        let hashpass = "";
-        jwt.verify(token,process.env.SECRET_ACCESS_TOKEN,(err,user)=>{
-            if(err)return res.status(403).json({
-                status: 'forbidden'
-            });
-            hashpass = user.user.password;
-        });
+        const {oldpass,newpass} = req.body;
+        const {email} = req.body.user;
+        const hashpass = req.body.user.password;
         const check = await compare(oldpass,hashpass);
         if(!check){
             return res.status(404).json({
@@ -124,4 +124,26 @@ const changePassword = async (req,res) => {
     }
 }
 
-module.exports = { signup, login, deleteUser,changePassword};
+const logout = async (req,res) => {
+    try{
+        if(!req.body.user){
+            return res.status(404).json({
+                status: 'No User is logged in'
+            });
+        }
+        res.cookie("jwt",null,{
+            expires: new Date(Date.now()),
+            httponly: true
+        });
+        return res.status(200).json({
+            status: 'success, logged out'
+        });
+    }catch(err){
+        console.log(err);
+        return res.status(404).json({
+            status: 'logout catch error'
+        });
+    }
+}
+
+module.exports = { signup, login, deleteUser,changePassword,logout};

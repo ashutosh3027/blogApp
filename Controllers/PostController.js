@@ -23,7 +23,13 @@ const editPost = async (req, res) => {
     try {
         const user_id = req.body.user.id;
         const { body, id } = req.body;
-        await db.Posts.update({ body, updatedAt: db.Sequelize.literal("CURRENT_TIMESTAMP") }, { where: { id, user_id } });
+        const check_id = db.Posts.findAll({attributes: {user_id}, where: {id}});
+        if(user_id!==check_id[0]){
+            return res.status(404).json({
+                status: 'Unauthorized',
+            });
+        }
+        await db.Posts.update({ body, updatedAt: db.Sequelize.literal("CURRENT_TIMESTAMP") }, { where: { id } });
         return res.status(200).json({
             status: 'success, post edited',
         });
@@ -59,7 +65,13 @@ const deletePost = async (req, res) => {
     try {
         const user_id = req.body.user.id;
         const { id } = req.body;
-        await db.Posts.destroy({ where: { id, user_id } });
+        const check_id = db.Posts.findAll({attributes: {user_id}, where: {id}});
+        if(user_id!==check_id[0]){
+            return res.status(404).json({
+                status: 'Unauthorized',
+            });
+        }
+        await db.Posts.destroy({ where: { id } });
         return res.status(200).json({
             status: 'success, post deleted',
         });
