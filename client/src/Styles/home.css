@@ -1,0 +1,16 @@
+.parent{
+    display: flex;
+    flex-direction: row;
+}
+
+.child1{
+    width: 50%;
+}
+
+.child2{
+    width: 50%;
+}
+
+.bg-img{
+    max-width: 95%;
+}
