@@ -19,16 +19,14 @@ const signup = async (req, res) => {
             password: hash
         });
         console.log(newUser);
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success'
         });
-        return;
     } catch (err) {
         console.log("test:",err);
-        res.status(404).json({
+        return res.status(404).json({
             status: 'Signup Error'
         });
-        return;
     }
 };
 
