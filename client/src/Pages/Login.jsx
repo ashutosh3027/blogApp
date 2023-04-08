@@ -30,7 +30,10 @@ function Login() {
         }
         try {
             const data = await authServices.login(email, password);
-            console.log(data);
+            if(event.target[2].checked){
+                Cookies.set("email",email,{expires: 7});
+                Cookies.set("pass",password,{expires: 7});
+            }
             toast.success("Logged in Successfully", {
                 position: "top-center",
                 autoClose: 2000,
@@ -61,11 +64,11 @@ function Login() {
                 <Form onSubmit={submit}>
                     <Form.Group className='m-3' controlId='email'>
                         <Form.Label>Email</Form.Label>
-                        <Form.Control type='email' placeholder='Enter Email' required />
+                        <Form.Control type='email' placeholder='Enter Email' defaultValue={Cookies.get('email')} required />
                     </Form.Group>
                     <Form.Group className='mb-3 mx-3' controlId='password'>
                         <Form.Label>Password</Form.Label>
-                        <Form.Control type='password' placeholder='Enter Password' required />
+                        <Form.Control type='password' placeholder='Enter Password' defaultValue={Cookies.get('pass')} required />
                     </Form.Group>
                     <Form.Group className='mb-3 mx-3'>
                         <Form.Check type='checkbox' label='Remember Me' />
