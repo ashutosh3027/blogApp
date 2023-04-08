@@ -61,12 +61,40 @@ const getAllPost = async (req, res) => {
     }
 };
 
+const getPost = async (req, res) => {
+    try {
+        const user_id = req.body.user.id;
+        const {id} = req.params
+        console.log(req.body);
+        const posts = await db.Posts.findAll({
+            where: { user_id, id },
+            order: [['updatedAt', 'DESC']]
+        });
+        console.log(posts);
+        if(!posts){
+            return res.status(404).json({
+                status: "Couldn't find such post",
+            });
+        }
+        return res.status(200).json({
+            status: 'success, posts found',
+            posts
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(404).json({
+            status: 'getAllPost catch error',
+        });
+    }
+};
+
 const deletePost = async (req, res) => {
     try {
         const user_id = req.body.user.id;
-        const { id } = req.body;
-        const check_id = db.Posts.findAll({attributes: {user_id}, where: {id}});
-        if(user_id!==check_id[0]){
+        const { id } = req.params;
+        const check_id = await db.Posts.findAll({where: {id,user_id}});
+        console.log("**********CHeck ID:",user_id!==check_id[0].user_id,"*********");
+        if(user_id!==check_id[0].user_id){
             return res.status(404).json({
                 status: 'Unauthorized',
             });
@@ -83,4 +111,4 @@ const deletePost = async (req, res) => {
     }
 };
 
-module.exports = { newPost, editPost, getAllPost, deletePost };
+module.exports = { newPost, editPost, getAllPost, deletePost, getPost };

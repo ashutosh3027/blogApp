@@ -10,7 +10,7 @@ import Cookies from 'js-cookie'
 function Login() {
     const navigate = useNavigate();
     useEffect(() => {
-        if (Cookies.get("jwt")) navigate('/')
+        if (Cookies.get("jwt")) navigate('/home')
     }, []);
     const submit = async (event) => {
         event.preventDefault();
@@ -39,7 +39,7 @@ function Login() {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
-                onClose: () => navigate('/')
+                onClose: () => navigate('/home')
             });
         } catch (err) {
             toast.error(err.response.data.status, {

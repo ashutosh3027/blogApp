@@ -19,6 +19,7 @@
 | `POST` /api/v1/post/new           | ---------- | title, body               | New Post            |
 | `PUT` /api/v1/post/edit           | ---------- | id, body                  | Edit Post           |
 | `GET` /api/v1/post/get            | ---------- | ----------                | Get User Posts      |
+| `GET` /api/v1/post/get1           | ---------- | id                        | Get Single Post     |
 | `DELETE` /api/v1/post/delete      | ---------- | id                        | Delete User Post    |
 | `POST` /api/v1/comment/new        | ---------- | message, post_id          | New Comment         |
 | `PUT` /api/v1/comment/edit        | ---------- | id, message               | Edit Comment        |

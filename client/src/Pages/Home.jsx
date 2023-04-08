@@ -1,9 +1,15 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import Navigation from '../Components/Navigation'
 import background from '../Images/background.jpeg'
 import '../Styles/home.css'
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie'
 
 function Home() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (Cookies.get("jwt")) navigate('/home')
+  }, []);
   return (
     <>
       <Navigation />

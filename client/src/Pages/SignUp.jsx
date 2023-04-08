@@ -10,7 +10,7 @@ import Cookies from 'js-cookie'
 function SignUp() {
   const navigate = useNavigate();
   useEffect(() => {
-    if (Cookies.get("jwt")) navigate('/')
+    if (Cookies.get("jwt")) navigate('/home')
   }, []);
   const submit = async (event) => {
     event.preventDefault();
@@ -67,7 +67,7 @@ function SignUp() {
       <div className='container-sm'>
         <Form onSubmit={submit}>
           <Form.Group className='m-3' controlId='fullname'>
-            <Form.Label className='d-block'>Full Name</Form.Label>
+            <Form.Label>Full Name</Form.Label>
             <Form.Control type='text' placeholder='Enter Full Name' required />
           </Form.Group>
           <Form.Group className='mb-3 mx-3' controlId='email'>
