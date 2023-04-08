@@ -62,7 +62,7 @@ function EditPost() {
           <h1 className='m-3'>{post.title}</h1>
           <Form.Group className='mb-3 mx-3' controlId='body'>
             <Form.Label>Body</Form.Label>
-            <Form.Control type='textarea' value={post.body} required />
+            <Form.Control as='textarea' rows={3} defaultValue={post.body} required />
           </Form.Group>
           <Form.Group className='mb-3 mx-3'>
             <Button variant='danger' onClick={cancel}>Cancel</Button>

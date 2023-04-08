@@ -23,8 +23,8 @@ const editPost = async (req, res) => {
     try {
         const user_id = req.body.user.id;
         const { body, id } = req.body;
-        const check_id = db.Posts.findAll({attributes: {user_id}, where: {id}});
-        if(user_id!==check_id[0]){
+        const check_id = await db.Posts.findAll({attributes: ['user_id'], where: {id}});
+        if(user_id!==check_id[0].user_id){
             return res.status(404).json({
                 status: 'Unauthorized',
             });
@@ -93,7 +93,6 @@ const deletePost = async (req, res) => {
         const user_id = req.body.user.id;
         const { id } = req.params;
         const check_id = await db.Posts.findAll({where: {id,user_id}});
-        console.log("**********CHeck ID:",user_id!==check_id[0].user_id,"*********");
         if(user_id!==check_id[0].user_id){
             return res.status(404).json({
                 status: 'Unauthorized',

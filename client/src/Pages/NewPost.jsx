@@ -56,7 +56,7 @@ function NewPost() {
                     </Form.Group>
                     <Form.Group className='mb-3 mx-3' controlId='body'>
                         <Form.Label>Body</Form.Label>
-                        <Form.Control type='textarea' placeholder='body' required />
+                        <Form.Control as="textarea" rows={3} placeholder='body' required />
                     </Form.Group>
                     <Form.Group className='mb-3 mx-3'>
                         <Button variant='danger' onClick={cancel}>Cancel</Button>
