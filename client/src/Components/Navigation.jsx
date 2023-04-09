@@ -21,7 +21,7 @@ function Navigation() {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        onClose: () => navigate('/login')
+        onClose: () => navigate('/')
       });
     } catch (err) {
       toast.error(err.response.data.status, {

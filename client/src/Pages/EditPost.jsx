@@ -7,10 +7,15 @@ import Button from 'react-bootstrap/Button';
 import postServices from '../services/postServices';
 import { toast } from 'react-toastify';
 import { useParams } from 'react-router-dom';
+import DiscardModal from '../Components/DiscardModal';
 
 function EditPost() {
   const [post, setPost] = useState({});
   const { id } = useParams();
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const [obj,setObj] = useState({});
   useEffect(() => {
     if (!Cookies.get("jwt")) navigate('/');
     (async () => {
@@ -51,9 +56,16 @@ function EditPost() {
     }
   }
   const cancel = () => {
-
-    navigate("/home");
-  }
+    setObj({
+        title: "Discard",
+        body: "Are you sure you want to leave. Your changes will be discarded.",
+        b1: "Don't Leave",
+        b2: "Leave",
+        event: "cancel",
+        close: handleClose
+    });
+    handleShow();
+}
   return (
     <>
       <Navigation />
@@ -70,6 +82,7 @@ function EditPost() {
           </Form.Group>
         </Form>
       </div>
+      <DiscardModal show={show} obj={obj} />
     </>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import Navigation from '../Components/Navigation'
 import Cookies from 'js-cookie'
 import { useNavigate } from 'react-router-dom';
@@ -6,8 +6,13 @@ import Button from 'react-bootstrap/Button';
 import { Form } from 'react-bootstrap';
 import postServices from '../services/postServices';
 import { toast } from 'react-toastify';
+import DiscardModal from '../Components/DiscardModal';
 
 function NewPost() {
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    const [obj,setObj] = useState({});
     const navigate = useNavigate();
     useEffect(() => {
         if (!Cookies.get("jwt")) navigate('/')
@@ -41,8 +46,15 @@ function NewPost() {
         }
     }
     const cancel = () => {
-
-        navigate("/home");
+        setObj({
+            title: "Discard",
+            body: "Are you sure you want to leave. Your changes will be discarded.",
+            b1: "Don't Leave",
+            b2: "Leave",
+            event: "cancel",
+            close: handleClose
+        });
+        handleShow();
     }
     return (
         <>
@@ -64,6 +76,7 @@ function NewPost() {
                     </Form.Group>
                 </Form>
             </div>
+            <DiscardModal show={show} obj={obj} />
         </>
     )
 }
