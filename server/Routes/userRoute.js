@@ -3,7 +3,7 @@ const {signup,login,deleteUser,changePassword,logout,getUser} = require('../Cont
 
 router.route('/newuser').post(signup);
 router.route('/login').post(login);
-router.route('/deleteuser').delete(deleteUser);
+router.route('/delete/:password').delete(deleteUser);
 router.route('/changepassword').put(changePassword);
 router.route('/logout').post(logout);
 router.route('/').get(getUser);

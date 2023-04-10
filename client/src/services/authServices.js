@@ -24,5 +24,16 @@ class AuthService{
         const {data} = await API.get("/user/");
         return data;
     }
+    async changePassword(oldpass,newpass){
+        const {data} = await API.put("/user/changepassword",{
+            oldpass,
+            newpass
+        });
+        return data;
+    }
+    async deleteAccount(password){
+        const {data} = await API.delete(`/user/delete/${password}`);
+        return data;
+    }
 };
 export default new AuthService();

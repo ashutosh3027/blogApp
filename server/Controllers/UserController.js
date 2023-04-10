@@ -65,14 +65,22 @@ const login = async (req, res) => {
 
 const deleteUser = async (req, res) => {
     try {
-        const { password } = req.body;
-        const { email } = req.body.user;
+        const { password } = req.params;
+        const { id } = req.body.user;
         const hashpass = req.body.user.password;
         const check = await compare(password, hashpass);
         if (check) {
-            await db.User.destroy({ where: { email } });
+            await db.User.destroy({ where: { id } });
             res.cookie("jwt", null, {
-                expires: Date.now(),
+                expires: new Date(Date.now()),
+                httponly: true
+            });
+            res.cookie("email",null,{
+                expires: new Date(Date.now()),
+                httponly: true
+            });
+            res.cookie("pass",null,{
+                expires: new Date(Date.now()),
                 httponly: true
             });
             return res.status(200).json({
