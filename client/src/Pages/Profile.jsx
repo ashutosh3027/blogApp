@@ -7,6 +7,7 @@ import { Button } from 'react-bootstrap';
 import ChangePasswordModal from '../Components/ChangePasswordModal';
 import { toast } from 'react-toastify';
 import DeleteUserModal from '../Components/DeleteUserModal';
+import followServices from '../services/followServices';
 
 function Profile() {
   const navigate = useNavigate();
@@ -21,8 +22,10 @@ function Profile() {
     if (!Cookies.get("jwt")) navigate('/');
     (async () => {
       const data = await authServices.getUser();
-      console.log(data.user);
-      setUser(data.user);
+      const {follows} = await followServices.getFollows();
+      const {followings} = await followServices.getFollowings();
+      console.log(data.user,follows.length,followings.length);
+      setUser({...data.user,follows: follows.length,followings: followings.length});
     })();
   }, [])
   const changePass = async (event) => {
@@ -104,6 +107,8 @@ function Profile() {
       <h1>Profile</h1>
       <h2>Name: {user.fullname}</h2>
       <h3>Email: {user.email}</h3>
+      <p>Follows: {user.follows}</p>
+      <p>Followings: {user.followings}</p>
       <Button variant='primary' onClick={handleShow}>Change Password</Button>
       <Button variant='danger' onClick={handleShow1}>Delete Account</Button>
       <ChangePasswordModal show={show} close={handleClose} changePass={changePass} />

@@ -9,6 +9,7 @@ function DiscardModal(props) {
             props.obj.close();
             navigate("/home");
         }
+        else if(props.obj.event === "deletepost")props.deletePost(props.obj.id);
     }
     return (
         <>

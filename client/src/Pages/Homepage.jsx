@@ -6,9 +6,14 @@ import Button from 'react-bootstrap/Button';
 import postServices from '../services/postServices';
 import Card from 'react-bootstrap/Card';
 import { toast } from 'react-toastify';
+import DiscardModal from '../Components/DiscardModal';
 
 function Homepage() {
     const [post, setPost] = useState([]);
+    const [obj,setObj] = useState({});
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     const navigate = useNavigate();
     useEffect(() => {
         if (!Cookies.get("jwt")) navigate('/');
@@ -29,10 +34,11 @@ function Homepage() {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
-                onClose: () => navigate('/')
+                onClose: () => {handleClose();navigate('/')}
               });
         }catch(err){
-            toast.error("Backend Error, Couldn't delete post", {
+            const msg = err.response.data.status || "Backend Error, Couldn't delete post";
+            toast.error(msg, {
                 position: "top-center",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -42,6 +48,19 @@ function Homepage() {
                 theme: "colored"
               });
         }
+    }
+    const deleteModal = (id) => {
+        setObj({
+            title: "Delete Post",
+            body: "Are you sure you want to delete this post?",
+            b1: "Don't Delete",
+            b2: "Delete",
+            event: "deletepost",
+            b2c: "danger",
+            id,
+            close: handleClose
+        });
+        handleShow();
     }
     return (
         <div className='m-3'>
@@ -63,13 +82,14 @@ function Homepage() {
                                     <Card.Text>{el.body}</Card.Text>
                                     <Button href={'/post/'+el.id}>Read More</Button>
                                     <Button variant='info' className='m-1' href={'/edit/'+el.id}>Edit</Button>
-                                    <Button variant='danger' onClick={()=>deletePost(el.id)}>Delete</Button>
+                                    <Button variant='danger' onClick={()=>deleteModal(el.id)}>Delete</Button>
                                 </Card.Body>
                             </Card>
                         )
                     })
                 }
             </div>
+            <DiscardModal show={show} obj={obj} deletePost={deletePost} />
         </div>
     )
 }

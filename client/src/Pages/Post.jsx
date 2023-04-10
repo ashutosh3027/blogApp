@@ -6,9 +6,14 @@ import { toast } from 'react-toastify';
 import postServices from '../services/postServices';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import DiscardModal from '../Components/DiscardModal';
 
 function Post() {
   const [post, setPost] = useState({});
+  const [obj, setObj] = useState({});
+  const [show, setShow] = useState(false);
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
   const { id } = useParams();
   const navigate = useNavigate();
   useEffect(() => {
@@ -21,30 +26,44 @@ function Post() {
     })();
   }, []);
   const deletePost = async (id) => {
-    try{
-        await postServices.deletePost(id);
-        toast.success("Success, Post Deleted", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored",
-            onClose: () => navigate('/home')
-          });
-    }catch(err){
-        toast.error("Backend Error, Couldn't delete post", {
-            position: "top-center",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            draggable: true,
-            progress: undefined,
-            theme: "colored"
-          });
+    try {
+      await postServices.deletePost(id);
+      toast.success("Success, Post Deleted", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        onClose: () => { handleClose(); navigate('/') }
+      });
+    } catch (err) {
+      const msg = err.response.data.status || "Backend Error, Couldn't delete post";
+      toast.error(msg, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored"
+      });
     }
-}
+  }
+  const deleteModal = (id) => {
+    setObj({
+      title: "Delete Post",
+      body: "Are you sure you want to delete this post?",
+      b1: "Don't Delete",
+      b2: "Delete",
+      event: "deletepost",
+      b2c: "danger",
+      id,
+      close: handleClose
+    });
+    handleShow();
+  }
   return (
     <>
       <Navigation />
@@ -52,9 +71,10 @@ function Post() {
       <p>by Mallik Prabhanjan</p>
       <p className='text-muted'>{new Date(post.createdAt).toLocaleDateString("en-IN")}</p>
       <Button variant='secondary' href='/home'>All Posts</Button>
-      <Button variant='info' href={'/edit/'+id}>Edit</Button>
-      <Button variant='danger' onClick={() => deletePost(id)}>Delete</Button>
+      <Button variant='info' href={'/edit/' + id}>Edit</Button>
+      <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
       <p>{post.body}</p>
+      <DiscardModal show={show} obj={obj} deletePost={deletePost} />
     </>
   )
 }
