@@ -52,6 +52,7 @@ function NewPost() {
             b1: "Don't Leave",
             b2: "Leave",
             event: "cancel",
+            b2c: "primary",
             close: handleClose
         });
         handleShow();

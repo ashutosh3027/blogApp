@@ -19,7 +19,7 @@ function DiscardModal(props) {
                 <Modal.Body>{props.obj.body}</Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={props.obj.close}>{props.obj.b1}</Button>
-                    <Button variant="primary" onClick={close}>{props.obj.b2}</Button>
+                    <Button variant={props.obj.b2c} onClick={close}>{props.obj.b2}</Button>
                 </Modal.Footer>
             </Modal>
         </>

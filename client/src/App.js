@@ -7,6 +7,7 @@ import Homepage from './Pages/Homepage';
 import NewPost from './Pages/NewPost';
 import Post from './Pages/Post';
 import EditPost from './Pages/EditPost';
+import Profile from './Pages/Profile';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route exact path='/newpost' element={<NewPost/>}></Route>
           <Route exact path='/post/:id' element={<Post/>}></Route>
           <Route exact path='/edit/:id' element={<EditPost/>}></Route>
+          <Route exact path='/profile' element={<Profile/>}></Route>
         </Routes>
       </Router>
     </div>

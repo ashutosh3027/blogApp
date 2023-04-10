@@ -20,5 +20,9 @@ class AuthService{
         });
         return data;
     }
+    async getUser(){
+        const {data} = await API.get("/user/");
+        return data;
+    }
 };
 export default new AuthService();
