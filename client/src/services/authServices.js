@@ -35,5 +35,9 @@ class AuthService{
         const {data} = await API.delete(`/user/delete/${password}`);
         return data;
     }
+    async getUserById(id){
+        const {data} = await API.get(`/user/get/${id}`);
+        return data;
+    }
 };
 export default new AuthService();

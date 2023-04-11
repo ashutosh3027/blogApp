@@ -22,6 +22,7 @@ function Post() {
       console.log(id)
       const { posts } = await postServices.getPost(id);
       console.log(posts)
+      if(posts.length===0)navigate("/*");
       setPost(posts[0]);
     })();
   }, []);

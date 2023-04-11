@@ -107,6 +107,7 @@ function Profile() {
       <h1>Profile</h1>
       <h2>Name: {user.fullname}</h2>
       <h3>Email: {user.email}</h3>
+      <p>Account Created On: {new Date(user.createdAt).toLocaleDateString("en-IN")}</p>
       <p>Follows: {user.follows}</p>
       <p>Followings: {user.followings}</p>
       <Button variant='primary' onClick={handleShow}>Change Password</Button>

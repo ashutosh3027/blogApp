@@ -1,6 +1,7 @@
 const db = require('../utils/db');
 const { hashPassword, compare } = require('../utils/hashPass');
 const jwt = require('jsonwebtoken');
+const { where } = require('sequelize');
 
 const signup = async (req, res) => {
     // console.log(typeof User.findOne);
@@ -175,4 +176,20 @@ const getUser = async (req, res) => {
     }
 }
 
-module.exports = { signup, login, deleteUser, changePassword, logout, getUser };
+const getUserById = async (req,res) => {
+    try{
+        const {id} = req.params;
+        const user = await db.User.findOne({attributes: ['id','fullname','email','createdAt']}, {where: {id}});
+        return res.status(200).json({
+            status: 'user found',
+            user
+        });
+    }catch(err){
+        console.log(err);
+        return res.status(404).json({
+            status: 'getuserbyid catch error'
+        });
+    }
+}
+
+module.exports = { signup, login, deleteUser, changePassword, logout, getUser, getUserById };
