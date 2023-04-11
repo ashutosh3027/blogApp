@@ -38,7 +38,7 @@ const newFollow = async (req,res) => {
 
 const unFollow = async (req,res) => {
     try{
-        const {user_id_following} = req.body;
+        const user_id_following = req.params.id;
         const user_id_follow = req.body.user.id;
         const count1 = await db.User.count({where:{id:user_id_following}});
         if(count1===0){
@@ -104,11 +104,12 @@ const getFollowings = async (req,res) => {
 
 const getFollowsById = async (req,res) => {
     try{
-        const user_id_follow = req.params.id;
-        const check = await db.Follows.findOne({where: {user_id_follow,user_id_following: req.body.user.id }});
+        const user_id_following = req.params.id;
+        const check = await db.Follows.findOne({where: {user_id_following,user_id_follow: req.body.user.id }});
+        console.log(check);
         if(check){
             const follows = await db.Follows.findAll({
-                where: {user_id_follow},
+                where: {user_id_follow: user_id_following},
                 order: [['createdAt','DESC']]
             });
             res.status(200).json({
@@ -116,7 +117,7 @@ const getFollowsById = async (req,res) => {
                 follows
             });
         }else{
-            const count = await db.Follows.count({where:{user_id_follow}});
+            const count = await db.Follows.count({where:{user_id_follow: user_id_following}});
             res.status(200).json({
                 status: 'success, follows count found',
                 count
@@ -133,7 +134,7 @@ const getFollowsById = async (req,res) => {
 const getFollowingsById = async (req,res) => {
     try{
         const user_id_following = req.params.id;
-        const check = await db.Follows.findOne({where: {user_id_follow: user_id_following,user_id_following: req.body.user.id }});
+        const check = await db.Follows.findOne({where: {user_id_following,user_id_follow: req.body.user.id }});
         if(check){
             const followings = await db.Follows.findAll({
                 where: {user_id_following},
