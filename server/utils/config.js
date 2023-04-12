@@ -2,7 +2,7 @@ module.exports={
     "database":{
         "host":"localhost",
         "port":3306,
-        "user":"root",
+        "user":process.env.DATABASE_USER||"root",
         "password":process.env.PASSWORD,
         "database":"blogApp"
     },

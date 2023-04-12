@@ -10,24 +10,26 @@ import { toast } from 'react-toastify';
 function OtherProfile() {
     const navigate = useNavigate();
     const [user, setUser] = useState({});
-    const { id } = useParams();
+    const [id, setId] = useState(null);
+    const { id:tempId } = useParams();
     const [f1, setF1] = useState(<></>);
     const [f2, setF2] = useState(<></>);
     const [f3, setF3] = useState(<></>);
 
     useEffect(() => {
         if (!Cookies.get("jwt")) navigate("/");
+        setId(tempId);
         (async () => {
             const data = await authServices.getUserById(id);
-            await followData();
             console.log(data.user);
             setUser({ ...data.user });
-        })();
-    }, []);
+        })(); 
+    }, [id]);
     useEffect(()=>{
-        console.log(user);
+        (async()=>{
+            await followData();
+        })();
     }, [user]);
-
     const followData = async () => {
         const follows = await followServices.getFollowsById(id);
         const followings = await followServices.getFollowingsByID(id);
@@ -46,10 +48,8 @@ function OtherProfile() {
 
     const follow = async () => {
         try {
-            console.log(user)
             const data = await followServices.follow(id);
             console.log(data);
-            console.log("test:",user);
             console.log("🔥🔥🔥🔥🔥",user.fullname);
             toast.success(`You started following ${user.fullname}`, {
                 position: "top-center",

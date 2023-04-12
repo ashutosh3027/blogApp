@@ -4,6 +4,7 @@ const Sequelize = require('sequelize');
 var db = {};
 const initialize = async () => {
     const { host, port, user, password, database } = config.database;
+    console.log("Test config:",host, port, user, password, database)
     const pool = mysql.createPool({ host, port, user, password });
     pool.query(`CREATE DATABASE IF NOT  EXISTS ${database};`, async (err, res) => {
         if (err) throw err;
@@ -11,7 +12,7 @@ const initialize = async () => {
         const sequelize = new Sequelize(database, user, password, {
             host, port,
             dialect: "mysql",
-            pool: {
+            pool:{
                 max: config.pool.max,
                 min: config.pool.min,
                 acquire: config.pool.acquire,
