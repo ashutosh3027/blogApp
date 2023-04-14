@@ -7,6 +7,7 @@ import Cookies from 'js-cookie'
 import {ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import SearchBar from './SearchBar';
 
 function Navigation() {
   const navigate = useNavigate();
@@ -39,6 +40,7 @@ function Navigation() {
     if (Cookies.get('jwt')) {
       return (
         <>
+          <SearchBar/>
           <Nav.Link href="/profile">Profile</Nav.Link>
           <Button variant='secondary' onClick={logout}>Logout</Button>
         </>

@@ -1,7 +1,7 @@
 const db = require('../utils/db');
 const { hashPassword, compare } = require('../utils/hashPass');
 const jwt = require('jsonwebtoken');
-const { where } = require('sequelize');
+const { where, Op } = require('sequelize');
 
 const signup = async (req, res) => {
     // console.log(typeof User.findOne);
@@ -76,11 +76,11 @@ const deleteUser = async (req, res) => {
                 expires: new Date(Date.now()),
                 httponly: true
             });
-            res.cookie("email",null,{
+            res.cookie("email", null, {
                 expires: new Date(Date.now()),
                 httponly: true
             });
-            res.cookie("pass",null,{
+            res.cookie("pass", null, {
                 expires: new Date(Date.now()),
                 httponly: true
             });
@@ -119,11 +119,11 @@ const changePassword = async (req, res) => {
             expires: new Date(Date.now() + 172800000),
             httponly: true
         });
-        res.cookie("email",null,{
+        res.cookie("email", null, {
             expires: new Date(Date.now()),
             httponly: true
         });
-        res.cookie("pass",null,{
+        res.cookie("pass", null, {
             expires: new Date(Date.now()),
             httponly: true
         });
@@ -176,15 +176,15 @@ const getUser = async (req, res) => {
     }
 }
 
-const getUserById = async (req,res) => {
-    try{
-        const {id} = req.params;
-        const user = await db.User.findOne({attributes: ['id','fullname','email','createdAt']}, {where: {id}});
+const getUserById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await db.User.findOne({ attributes: ['id', 'fullname', 'email', 'createdAt'], where: { id } });
         return res.status(200).json({
             status: 'user found',
             user
         });
-    }catch(err){
+    } catch (err) {
         console.log(err);
         return res.status(404).json({
             status: 'getuserbyid catch error'
@@ -192,4 +192,29 @@ const getUserById = async (req,res) => {
     }
 }
 
-module.exports = { signup, login, deleteUser, changePassword, logout, getUser, getUserById };
+const getUsers = async (req, res) => {
+    try {
+        const { page = 1, name } = req.query;
+        const { id } = req.body.user;
+        const users = await db.User.findAll({
+            attributes: ['id', 'fullname'],
+            where: { fullname: { [Op.regexp]: `${name}` }, id: { [Op.ne]: id } },
+            order: [['updatedAt', 'DESC']],
+            offset: (page - 1) * 5,
+            limit: 5
+        });
+        const count = await db.User.count({ where: { fullname: { [Op.regexp]: `${name}` }, id: { [Op.ne]: id } } });
+        return res.status(200).json({
+            status: 'Results found',
+            users,
+            count
+        });
+    } catch (err) {
+        console.log(err);
+        return res.status(404).json({
+            status: 'getusers catch error'
+        });
+    }
+}
+
+module.exports = { signup, login, deleteUser, changePassword, logout, getUser, getUserById, getUsers };

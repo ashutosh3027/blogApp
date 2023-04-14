@@ -20,8 +20,9 @@ function OtherProfile() {
         if (!Cookies.get("jwt")) navigate("/");
         setId(tempId);
         (async () => {
+            const {user} = await authServices.getUser();
+            if(user.id===Number(id))navigate('/profile')
             const data = await authServices.getUserById(id);
-            console.log(data.user);
             setUser({ ...data.user });
         })(); 
     }, [id]);

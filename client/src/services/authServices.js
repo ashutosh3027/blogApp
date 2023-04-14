@@ -39,5 +39,9 @@ class AuthService{
         const {data} = await API.get(`/user/get/${id}`);
         return data;
     }
+    async getUsers(name,page=1){
+        const {data} = await API.get(`/user/search?name=${name}&page=${page}`);
+        return data;
+    }
 };
 export default new AuthService();

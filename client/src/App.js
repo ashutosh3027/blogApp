@@ -9,6 +9,7 @@ import Post from './Pages/Post';
 import EditPost from './Pages/EditPost';
 import Profile from './Pages/Profile';
 import OtherProfile from './Pages/OtherProfile';
+import Search from './Pages/Search';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
           <Route exact path='/edit/:id' element={<EditPost/>}></Route>
           <Route exact path='/profile' element={<Profile/>}></Route>
           <Route exact path='/profile/:id' element={<OtherProfile/>}></Route>
+          <Route exact path='/search' element={<Search/>}></Route>
           <Route exact path='/*' element={<h1>Error, Page not found.</h1>}></Route>
         </Routes>
       </Router>
