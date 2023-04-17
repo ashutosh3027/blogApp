@@ -10,21 +10,24 @@ import DiscardModal from '../Components/DiscardModal';
 
 function Homepage() {
     const [post, setPost] = useState([]);
-    const [obj,setObj] = useState({});
+    const [obj, setObj] = useState({});
     const [show, setShow] = useState(false);
+    const [id, setId] = useState(0);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     const navigate = useNavigate();
     useEffect(() => {
         if (!Cookies.get("jwt")) navigate('/');
         (async () => {
-            const { posts } = await postServices.getPosts();
-            console.log(posts)
-            setPost(posts);
+            const data = await postServices.getPosts();
+            console.log(data.posts);
+            console.log(data);
+            setPost(data.posts);
+            setId(data.user_id);
         })();
     }, []);
     const deletePost = async (id) => {
-        try{
+        try {
             await postServices.deletePost(id);
             toast.success("Success, Post Deleted", {
                 position: "top-center",
@@ -34,9 +37,9 @@ function Homepage() {
                 draggable: true,
                 progress: undefined,
                 theme: "colored",
-                onClose: () => {handleClose();navigate('/')}
-              });
-        }catch(err){
+                onClose: () => { handleClose(); navigate('/') }
+            });
+        } catch (err) {
             const msg = err.response.data.status || "Backend Error, Couldn't delete post";
             toast.error(msg, {
                 position: "top-center",
@@ -46,7 +49,7 @@ function Homepage() {
                 draggable: true,
                 progress: undefined,
                 theme: "colored"
-              });
+            });
         }
     }
     const deleteModal = (id) => {
@@ -71,18 +74,23 @@ function Homepage() {
             <div className='posts'>
                 {
                     post.map((el) => {
-                        let edited = <></>
-                        if(el.createdAt!==el.updatedAt)edited = <sup><i>(edited)</i></sup>
+                        let edited = <></>, buttons = <></>;
+                        if (el.createdAt !== el.updatedAt) edited = <sup><i>(edited)</i></sup>
+                        if (id === el.User.id) {
+                            buttons = <>
+                                <Button variant='info' className='m-1' href={'/edit/' + el.id}>Edit</Button>
+                                <Button variant='danger' onClick={() => deleteModal(el.id)}>Delete</Button>
+                            </>
+                        }
                         return (
                             <Card key={el.id} className="mb-3">
                                 <Card.Body>
                                     <Card.Title className='mb-3'>{el.title}</Card.Title>
-                                    <Card.Subtitle className='mb-2'>by Mallik Prabhanjan</Card.Subtitle>
+                                    <Card.Subtitle className='mb-2'>by {el.User.fullname}</Card.Subtitle>
                                     <Card.Text className='text-muted mb-3'>{new Date(el.createdAt).toLocaleDateString("en-IN")}{edited}</Card.Text>
                                     <Card.Text>{el.body}</Card.Text>
-                                    <Button href={'/post/'+el.id}>Read More</Button>
-                                    <Button variant='info' className='m-1' href={'/edit/'+el.id}>Edit</Button>
-                                    <Button variant='danger' onClick={()=>deleteModal(el.id)}>Delete</Button>
+                                    <Button href={'/post/' + el.id}>Read More</Button>
+                                    {buttons}
                                 </Card.Body>
                             </Card>
                         )

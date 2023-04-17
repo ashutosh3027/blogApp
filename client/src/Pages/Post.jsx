@@ -9,9 +9,10 @@ import Cookies from 'js-cookie';
 import DiscardModal from '../Components/DiscardModal';
 
 function Post() {
-  const [post, setPost] = useState({});
+  const [posts, setPosts] = useState({});
   const [obj, setObj] = useState({});
   const [show, setShow] = useState(false);
+  const [buttons, setButtons] = useState(<></>);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const { id } = useParams();
@@ -20,10 +21,14 @@ function Post() {
     if (!Cookies.get("jwt")) navigate('/');
     (async () => {
       console.log(id)
-      const { posts } = await postServices.getPost(id);
-      console.log(posts)
-      if(posts.length===0)navigate("/*");
-      setPost(posts[0]);
+      const { post, user_id } = await postServices.getPost(id);
+      console.log(post)
+      if (!post) navigate("/*");
+      setPosts(post);
+      if (user_id === post.user_id) setButtons(<>
+        <Button variant='info' href={'/edit/' + id}>Edit</Button>
+        <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
+      </>);
     })();
   }, []);
   const deletePost = async (id) => {
@@ -68,13 +73,12 @@ function Post() {
   return (
     <>
       <Navigation />
-      <h1 className='mx-3 mt-2'>{post.title}</h1>
+      <h1 className='mx-3 mt-2'>{posts.title}</h1>
       <p>by Mallik Prabhanjan</p>
-      <p className='text-muted'>{new Date(post.createdAt).toLocaleDateString("en-IN")}</p>
+      <p className='text-muted'>{new Date(posts.createdAt).toLocaleDateString("en-IN")}</p>
       <Button variant='secondary' href='/home'>All Posts</Button>
-      <Button variant='info' href={'/edit/' + id}>Edit</Button>
-      <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
-      <p>{post.body}</p>
+      {buttons}
+      <p>{posts.body}</p>
       <DiscardModal show={show} obj={obj} deletePost={deletePost} />
     </>
   )

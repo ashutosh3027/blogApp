@@ -15,16 +15,17 @@ function EditPost() {
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
-  const [obj,setObj] = useState({});
+  const [obj, setObj] = useState({});
+  const navigate = useNavigate();
   useEffect(() => {
     if (!Cookies.get("jwt")) navigate('/');
     (async () => {
-      const { posts } = await postServices.getPost(id);
-      console.log(posts)
-      setPost(posts[0]);
+      const { post, user_id } = await postServices.getPost(id);
+      if (user_id !== post.user_id) navigate('/home');
+      console.log(post)
+      setPost(post);
     })();
   }, []);
-  const navigate = useNavigate();
   useEffect(() => {
     if (!Cookies.get("jwt")) navigate('/')
   }, []);
@@ -57,16 +58,16 @@ function EditPost() {
   }
   const cancel = () => {
     setObj({
-        title: "Discard",
-        body: "Are you sure you want to leave. Your changes will be discarded.",
-        b1: "Don't Leave",
-        b2: "Leave",
-        event: "cancel",
-        b2c: "primary",
-        close: handleClose
+      title: "Discard",
+      body: "Are you sure you want to leave. Your changes will be discarded.",
+      b1: "Don't Leave",
+      b2: "Leave",
+      event: "cancel",
+      b2c: "primary",
+      close: handleClose
     });
     handleShow();
-}
+  }
   return (
     <>
       <Navigation />

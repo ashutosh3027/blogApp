@@ -1,4 +1,5 @@
 const db = require('../utils/db');
+const { Op } = require("sequelize");
 
 const newPost = async (req, res) => {
     try {
@@ -44,14 +45,29 @@ const editPost = async (req, res) => {
 const getAllPost = async (req, res) => {
     try {
         const user_id = req.body.user.id;
+        const followings = await db.Follows.findAll({
+            attributes:['user_id_following'],
+            where:{user_id_follow:user_id}
+        });
+        let ids = [];
+        for(let i=0;i<followings.length;i++){
+            ids.push(followings[i].user_id_following);
+        }ids.push(user_id);
         const posts = await db.Posts.findAll({
-            where: { user_id },
+            include: [{
+                model: db.User,
+                attributes: ['id','fullname']
+            }],
+            where: {user_id:{
+                [Op.in]: ids
+            }},
             order: [['updatedAt', 'DESC']]
         });
         console.log(posts);
         return res.status(200).json({
             status: 'success, posts found',
-            posts
+            posts,
+            user_id
         });
     } catch (err) {
         console.log(err);
@@ -66,19 +82,20 @@ const getPost = async (req, res) => {
         const user_id = req.body.user.id;
         const {id} = req.params
         console.log(req.body);
-        const posts = await db.Posts.findAll({
-            where: { user_id, id },
+        const post = await db.Posts.findOne({
+            where: { id },
             order: [['updatedAt', 'DESC']]
         });
-        console.log(posts);
-        if(!posts){
+        console.log(post);
+        if(!post){
             return res.status(404).json({
                 status: "Couldn't find such post",
             });
         }
         return res.status(200).json({
             status: 'success, posts found',
-            posts
+            post,
+            user_id
         });
     } catch (err) {
         console.log(err);
