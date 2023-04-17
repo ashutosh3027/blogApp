@@ -7,6 +7,7 @@ import postServices from '../services/postServices';
 import Card from 'react-bootstrap/Card';
 import { toast } from 'react-toastify';
 import DiscardModal from '../Components/DiscardModal';
+import '../Styles/homepage.css'
 
 function Homepage() {
     const [post, setPost] = useState([]);
@@ -86,7 +87,7 @@ function Homepage() {
                             <Card key={el.id} className="mb-3">
                                 <Card.Body>
                                     <Card.Title className='mb-3'>{el.title}</Card.Title>
-                                    <Card.Subtitle className='mb-2'>by {el.User.fullname}</Card.Subtitle>
+                                    <Card.Subtitle className='mb-2'>by <span className='fullname' onClick={()=>navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</span></Card.Subtitle>
                                     <Card.Text className='text-muted mb-3'>{new Date(el.createdAt).toLocaleDateString("en-IN")}{edited}</Card.Text>
                                     <Card.Text>{el.body}</Card.Text>
                                     <Button href={'/post/' + el.id}>Read More</Button>
