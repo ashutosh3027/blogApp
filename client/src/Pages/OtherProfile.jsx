@@ -52,6 +52,7 @@ function OtherProfile() {
             const data = await followServices.follow(id);
             console.log(data);
             console.log("🔥🔥🔥🔥🔥",user.fullname);
+            await followData();
             toast.success(`You started following ${user.fullname}`, {
                 position: "top-center",
                 autoClose: 2000,
@@ -59,8 +60,7 @@ function OtherProfile() {
                 closeOnClick: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored",
-                onClose: () => followData()
+                theme: "colored"
             });
         } catch (err) {
             const msg = err.response.data.status || "Backend Error, Couldn't create follow";
@@ -82,6 +82,7 @@ function OtherProfile() {
             console.log(data);
             console.log("test:",user);
             console.log("🔥🔥🔥🔥🔥",user.fullname);
+            await followData();
             toast.success(`Unfollowed ${user.fullname}`, {
                 position: "top-center",
                 autoClose: 2000,
@@ -89,8 +90,7 @@ function OtherProfile() {
                 closeOnClick: true,
                 draggable: true,
                 progress: undefined,
-                theme: "colored",
-                onClose: () => followData()
+                theme: "colored"
             });
         } catch (err) {
             const msg = err.response.data.status || "Backend Error, Couldn't create follow";
