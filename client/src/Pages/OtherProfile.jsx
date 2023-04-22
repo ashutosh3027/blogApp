@@ -51,7 +51,7 @@ function OtherProfile() {
             setF3(<><p>You don't follow this user</p><Button variant='primary' onClick={follow}>Follow</Button></>);
             setF4(<><div>This Account is Private</div><AiOutlineLock /></>)
         } else {
-            const { posts } = await postServices.getPostsById(id);
+            const { posts, user_id } = await postServices.getPostsById(id);
             setF1(<p><span className='follow' onClick={() => showFollows(follows.follows)}>Follows: {follows.follows.length}</span></p>);
             setF2(<p><span className='follow' onClick={() => showFollowings(followings.followings)}>Followings: {followings.followings.length}</span></p>);
             setF3(<><p>You follow this user</p><Button variant='secondary' onClick={unfollow}>Unfollow</Button></>);
@@ -59,7 +59,7 @@ function OtherProfile() {
                 <div>
                     {
                         posts.map((el) => {
-                            return (<PostCardComponent key={el.id} post={el} isUser={false} />)
+                            return (<PostCardComponent key={el.id} post={el} isUser={false} user_id={user_id} />)
                         })
                     }
                 </div>

@@ -76,7 +76,7 @@ function Homepage() {
             <div className='posts'>
                 {
                     post.map((el) => {
-                        return (<PostCardComponent key={el.id} post={el} isUser={id === el.User.id} deleteModal={deleteModal} />)
+                        return (<PostCardComponent key={el.id} post={el} isUser={id === el.User.id} deleteModal={deleteModal} user_id={id} />)
                     })
                 }
             </div>

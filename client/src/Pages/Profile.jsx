@@ -184,7 +184,7 @@ function Profile() {
       <div className='posts'>
         {
           posts.map((el) => {
-            return (<PostCardComponent key={el.id} post={el} isUser={true} deleteModal={deleteModal} />)
+            return (<PostCardComponent key={el.id} post={el} isUser={true} deleteModal={deleteModal} user_id={user.id} />)
           })
         }
       </div>

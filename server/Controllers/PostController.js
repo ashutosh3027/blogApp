@@ -57,6 +57,8 @@ const getAllPost = async (req, res) => {
             include: [{
                 model: db.User,
                 attributes: ['id', 'fullname']
+            },{
+                model: db.Likes
             }],
             where: {
                 user_id: {
@@ -85,6 +87,9 @@ const getPost = async (req, res) => {
         const { id } = req.params
         console.log(req.body);
         const post = await db.Posts.findOne({
+            include: [{
+                model: db.Likes
+            }],
             where: { id },
             order: [['updatedAt', 'DESC']]
         });
@@ -144,6 +149,8 @@ const getPostsById = async (req, res) => {
                 include: [{
                     model: db.User,
                     attributes: ['id', 'fullname']
+                },{
+                    model: db.Likes
                 }],
                 where: {
                     user_id: id
@@ -152,7 +159,8 @@ const getPostsById = async (req, res) => {
             });
             return res.status(200).json({
                 status: 'success, posts found',
-                posts
+                posts,
+                user_id: req.body.user.id
             });
         }else{
             return res.status(404).json({
