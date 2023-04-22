@@ -3,6 +3,7 @@ import { Card, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { FcLike } from 'react-icons/fc'
 import { AiOutlineHeart } from 'react-icons/ai'
+import likeServices from '../services/likeServices'
 import '../Styles/post.css'
 
 function PostCardComponent(props) {
@@ -29,10 +30,14 @@ function PostCardComponent(props) {
         }
     }, []);
     const likePost = async () => {
+        const data = await likeServices.like(props.post.id);
+        console.log(data);
         setLike(<span className='like' onClick={unlikePost}><FcLike />Like</span>);
         setLn(<span>You and {props.post.Likes?.length} others like this post</span>);
     }
     const unlikePost = async () => {
+        const data = await likeServices.unlike(props.post.id);
+        console.log(data);
         setLike(<span className='like' onClick={likePost}><AiOutlineHeart />Like</span>);
         setLn(<span>{props.post.Likes?.length} like this post</span>);
     }

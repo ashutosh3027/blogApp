@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import DiscardModal from '../Components/DiscardModal';
 import { FcLike } from 'react-icons/fc'
 import { AiOutlineHeart } from 'react-icons/ai'
+import likeServices from '../services/likeServices';
 
 function Post() {
   const [posts, setPosts] = useState({});
@@ -34,10 +35,10 @@ function Post() {
         <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
       </>);
       if (post.Likes?.find((ele) => Number(ele.user_id) === Number(user_id))) {
-        setLike(<span className='like' onClick={() => unlikePost(post.Likes?.length)}><FcLike />Like</span>);
+        setLike(<span className='like' onClick={() => unlikePost(post.Likes?.length, post.id)}><FcLike />Like</span>);
         setLn(<span>You and {post.Likes?.length - 1} others like this post</span>);
       } else {
-        setLike(<span className='like' onClick={() => likePost(post.Likes?.length)}><AiOutlineHeart />Like</span>);
+        setLike(<span className='like' onClick={() => likePost(post.Likes?.length, post.id)}><AiOutlineHeart />Like</span>);
         setLn(<span>{post.Likes?.length} like this post</span>);
       }
     })();
@@ -81,13 +82,16 @@ function Post() {
     });
     handleShow();
   }
-  const likePost = async (len) => {
-    console.log(posts);
-    setLike(<span className='like' onClick={() => unlikePost(len + 1)}><FcLike />Like</span>);
+  const likePost = async (len, id) => {
+    const data = await likeServices.like(id);
+    console.log(data);
+    setLike(<span className='like' onClick={() => unlikePost(len + 1, id)}><FcLike />Like</span>);
     setLn(<span>You and {len} others like this post</span>);
   }
-  const unlikePost = async (len) => {
-    setLike(<span className='like' onClick={() => likePost(len - 1)}><AiOutlineHeart />Like</span>);
+  const unlikePost = async (len, id) => {
+    const data = await likeServices.unlike(id);
+    console.log(data);
+    setLike(<span className='like' onClick={() => likePost(len - 1, id)}><AiOutlineHeart />Like</span>);
     setLn(<span>{len - 1} like this post</span>);
   }
   return (

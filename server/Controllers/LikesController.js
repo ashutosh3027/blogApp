@@ -27,7 +27,7 @@ const newLike = async (req,res) => {
 
 const deleteLike = async (req,res) => {
     try{
-        const {post_id}=req.body;
+        const {post_id}=req.params;
         const user_id = req.body.user.id;
         const count = await db.Likes.count({where:{user_id,post_id}});
         if(count===0){
@@ -47,23 +47,4 @@ const deleteLike = async (req,res) => {
     }
 };
 
-const getAllLikes = async (req,res) => {
-    try{
-        const {post_id} = req.body;
-        const likes = await db.Likes.findAll({
-            where:{post_id},
-            order: [['createdAt','DESC']]
-        });
-        res.status(200).json({
-            status: "success,likes found",
-            likes
-        })
-    }catch(err){
-        console.log(err);
-        res.status(404).json({
-            status: "getalllikes catch error",
-        })
-    }
-};
-
-module.exports = {newLike,deleteLike,getAllLikes};
+module.exports = {newLike,deleteLike};
