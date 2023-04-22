@@ -7,6 +7,7 @@ import postServices from '../services/postServices';
 import Card from 'react-bootstrap/Card';
 import { toast } from 'react-toastify';
 import DiscardModal from '../Components/DiscardModal';
+import PostCardComponent from '../Components/PostCardComponent';
 import '../Styles/homepage.css'
 
 function Homepage() {
@@ -75,26 +76,7 @@ function Homepage() {
             <div className='posts'>
                 {
                     post.map((el) => {
-                        let edited = <></>, buttons = <></>;
-                        if (el.createdAt !== el.updatedAt) edited = <sup><i>(edited)</i></sup>
-                        if (id === el.User.id) {
-                            buttons = <>
-                                <Button variant='info' className='m-1' href={'/edit/' + el.id}>Edit</Button>
-                                <Button variant='danger' onClick={() => deleteModal(el.id)}>Delete</Button>
-                            </>
-                        }
-                        return (
-                            <Card key={el.id} className="mb-3">
-                                <Card.Body>
-                                    <Card.Title className='mb-3'>{el.title}</Card.Title>
-                                    <Card.Subtitle className='mb-2'>by <span className='fullname' onClick={()=>navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</span></Card.Subtitle>
-                                    <Card.Text className='text-muted mb-3'>{new Date(el.createdAt).toLocaleDateString("en-IN")}{edited}</Card.Text>
-                                    <Card.Text>{el.body}</Card.Text>
-                                    <Button href={'/post/' + el.id}>Read More</Button>
-                                    {buttons}
-                                </Card.Body>
-                            </Card>
-                        )
+                        return (<PostCardComponent key={el.id} post={el} isUser={id === el.User.id} deleteModal={deleteModal} />)
                     })
                 }
             </div>

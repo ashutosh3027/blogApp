@@ -5,8 +5,11 @@ import Cookies from 'js-cookie'
 import Navigation from '../Components/Navigation'
 import authServices from '../services/authServices';
 import followServices from '../services/followServices';
+import postServices from '../services/postServices';
 import { toast } from 'react-toastify';
 import FollowModal from '../Components/FollowModal';
+import { AiOutlineLock } from 'react-icons/ai'
+import PostCardComponent from '../Components/PostCardComponent';
 import '../Styles/profile.css'
 
 function OtherProfile() {
@@ -17,6 +20,7 @@ function OtherProfile() {
     const [f1, setF1] = useState(<></>);
     const [f2, setF2] = useState(<></>);
     const [f3, setF3] = useState(<></>);
+    const [f4, setF4] = useState(<></>);
     const [show, setShow] = useState(false);
     const [obj, setObj] = useState({});
     const handleClose = () => setShow(false);
@@ -45,10 +49,21 @@ function OtherProfile() {
             setF1(<p>Follows: {follows.count}</p>);
             setF2(<p>Followings: {followings.count}</p>);
             setF3(<><p>You don't follow this user</p><Button variant='primary' onClick={follow}>Follow</Button></>);
+            setF4(<><div>This Account is Private</div><AiOutlineLock /></>)
         } else {
+            const { posts } = await postServices.getPostsById(id);
             setF1(<p><span className='follow' onClick={() => showFollows(follows.follows)}>Follows: {follows.follows.length}</span></p>);
             setF2(<p><span className='follow' onClick={() => showFollowings(followings.followings)}>Followings: {followings.followings.length}</span></p>);
             setF3(<><p>You follow this user</p><Button variant='secondary' onClick={unfollow}>Unfollow</Button></>);
+            setF4(<>
+                <div>
+                    {
+                        posts.map((el) => {
+                            return (<PostCardComponent key={el.id} post={el} isUser={false} />)
+                        })
+                    }
+                </div>
+            </>)
         }
         console.log(follows, followings);
     }
@@ -114,16 +129,16 @@ function OtherProfile() {
 
     const showFollows = (follows) => {
         setObj({
-          "title": `${user.fullname}'s Follows`,
-          "body": follows
+            "title": `${user.fullname}'s Follows`,
+            "body": follows
         });
         handleShow();
     }
 
     const showFollowings = (followings) => {
         setObj({
-          "title": `${user.fullname}'s Followings`,
-          "body": followings
+            "title": `${user.fullname}'s Followings`,
+            "body": followings
         });
         handleShow();
     }
@@ -135,7 +150,7 @@ function OtherProfile() {
             <h2>Name: {user.fullname}</h2>
             <h3>Email: {user.email}</h3>
             <p>Account Created On: {new Date(user.createdAt).toLocaleDateString("en-IN")}</p>
-            {f1}{f2}{f3}
+            {f1}{f2}{f3}{f4}
             <FollowModal show={show} close={handleClose} obj={obj} />
         </>
     )

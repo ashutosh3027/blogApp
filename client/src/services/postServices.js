@@ -23,6 +23,10 @@ class PostService{
         const {data} = await API.get(`/post/get/${id}`);
         return data
     }
+    async getPostsById(id){
+        const {data} = await API.get(`/post/getposts/${id}`);
+        return data;
+    }
     async deletePost(id){
         const data = await API.delete(`/post/delete/${id}`);
         return data;
