@@ -1,0 +1,7 @@
+.follow{
+    cursor: pointer;
+}
+.follow:hover{
+    background-color: rgb(214, 215, 215);
+    text-decoration: underline;
+}

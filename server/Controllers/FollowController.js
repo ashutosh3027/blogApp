@@ -1,4 +1,5 @@
 const db = require('../utils/db');
+const { Op } = require("sequelize");
 
 const newFollow = async (req,res) => {
     try{
@@ -68,6 +69,11 @@ const getFollows = async (req,res) => {
     try{
         const user_id_follow = req.body.user.id;
         const follows = await db.Follows.findAll({
+            include: [{
+                model: db.User,
+                attributes: ['id','fullname'],
+                as: 'followings_user'
+            }],
             where: {user_id_follow},
             order: [['createdAt','DESC']]
         });
@@ -87,8 +93,13 @@ const getFollowings = async (req,res) => {
     try{
         const user_id_following = req.body.user.id;
         const followings = await db.Follows.findAll({
+            include: [{
+                model: db.User,
+                attributes: ['id','fullname'],
+                as: 'follows_user'
+            }],
             where: {user_id_following},
-            order: [['createdAt','DESC']]
+            order: [['createdAt','DESC']],
         });
         res.status(200).json({
             status: 'success, follows found',
@@ -109,6 +120,11 @@ const getFollowsById = async (req,res) => {
         console.log(check);
         if(check){
             const follows = await db.Follows.findAll({
+                include: [{
+                    model: db.User,
+                    attributes: ['id','fullname'],
+                    as: 'followings_user'
+                }],
                 where: {user_id_follow: user_id_following},
                 order: [['createdAt','DESC']]
             });
@@ -137,8 +153,13 @@ const getFollowingsById = async (req,res) => {
         const check = await db.Follows.findOne({where: {user_id_following,user_id_follow: req.body.user.id }});
         if(check){
             const followings = await db.Follows.findAll({
+                include: [{
+                    model: db.User,
+                    attributes: ['id','fullname'],
+                    as: 'follows_user'
+                }],
                 where: {user_id_following},
-                order: [['createdAt','DESC']]
+                order: [['createdAt','DESC']],
             });
             res.status(200).json({
                 status: 'success, followings found',

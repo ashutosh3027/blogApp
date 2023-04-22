@@ -93,7 +93,8 @@ const initialize = async () => {
         });
         Follows.belongsTo(User, {
             foreignKey: 'user_id_follow',
-            targetKey: 'id'
+            targetKey: 'id',
+            as: 'follows_user'
         });
         User.hasMany(Follows, {
             foreignKey: 'user_id_following',
@@ -101,7 +102,8 @@ const initialize = async () => {
         });
         Follows.belongsTo(User, {
             foreignKey: 'user_id_following',
-            targetKey: 'id'
+            targetKey: 'id',
+            as: 'followings_user'
         });
         await sequelize.sync();
         db.User = User;

@@ -8,6 +8,8 @@ import ChangePasswordModal from '../Components/ChangePasswordModal';
 import { toast } from 'react-toastify';
 import DeleteUserModal from '../Components/DeleteUserModal';
 import followServices from '../services/followServices';
+import FollowModal from '../Components/FollowModal';
+import '../Styles/profile.css'
 
 function Profile() {
   const navigate = useNavigate();
@@ -18,14 +20,18 @@ function Profile() {
   const [show1, setShow1] = useState(false);
   const handleClose1 = () => setShow1(false);
   const handleShow1 = () => setShow1(true);
+  const [show2, setShow2] = useState(false);
+  const handleClose2 = () => setShow2(false);
+  const handleShow2 = () => setShow2(true);
+  const [obj, setObj] = useState({});
   useEffect(() => {
     if (!Cookies.get("jwt")) navigate('/');
     (async () => {
       const data = await authServices.getUser();
-      const {follows} = await followServices.getFollows();
-      const {followings} = await followServices.getFollowings();
-      console.log(data.user,follows.length,followings.length);
-      setUser({...data.user,follows: follows.length,followings: followings.length});
+      const { follows } = await followServices.getFollows();
+      const { followings } = await followServices.getFollowings();
+      console.log(data.user, follows, followings);
+      setUser({ ...data.user, follows: follows, followings: followings, fc: follows.length, flc: followings.length });
     })();
   }, [])
   const changePass = async (event) => {
@@ -86,7 +92,7 @@ function Profile() {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        onClose: () => {handleClose();navigate("/")}
+        onClose: () => { handleClose(); navigate("/") }
       });
     } catch (err) {
       const msg = err.response.data.status || "Backend error, Password couldn't be changed";
@@ -101,6 +107,20 @@ function Profile() {
       });
     }
   }
+  const showFollows = () => {
+    setObj({
+      "title": "Your Follows",
+      "body": user.follows
+    });
+    handleShow2();
+  }
+  const showFollowings = () => {
+    setObj({
+      "title": "Your Followings",
+      "body": user.followings
+    });
+    handleShow2();
+  }
   return (
     <>
       <Navigation />
@@ -108,12 +128,13 @@ function Profile() {
       <h2>Name: {user.fullname}</h2>
       <h3>Email: {user.email}</h3>
       <p>Account Created On: {new Date(user.createdAt).toLocaleDateString("en-IN")}</p>
-      <p>Follows: {user.follows}</p>
-      <p>Followings: {user.followings}</p>
+      <p><span className='follow' onClick={showFollows}>Follows: {user.fc}</span></p>
+      <p><span className='follow' onClick={showFollowings}>Followings: {user.flc}</span></p>
       <Button variant='primary' onClick={handleShow}>Change Password</Button>
       <Button variant='danger' onClick={handleShow1}>Delete Account</Button>
       <ChangePasswordModal show={show} close={handleClose} changePass={changePass} />
       <DeleteUserModal show={show1} close={handleClose1} deleteUser={deleteUser} />
+      <FollowModal show={show2} close={handleClose2} obj={obj} />
     </>
   )
 }
