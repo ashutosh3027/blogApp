@@ -7,12 +7,16 @@ import postServices from '../services/postServices';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import DiscardModal from '../Components/DiscardModal';
+import { FcLike } from 'react-icons/fc'
+import { AiOutlineHeart } from 'react-icons/ai'
 
 function Post() {
   const [posts, setPosts] = useState({});
   const [obj, setObj] = useState({});
   const [show, setShow] = useState(false);
   const [buttons, setButtons] = useState(<></>);
+  const [like, setLike] = useState(<></>)
+  const [ln, setLn] = useState(<></>);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const { id } = useParams();
@@ -29,6 +33,13 @@ function Post() {
         <Button variant='info' href={'/edit/' + id}>Edit</Button>
         <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
       </>);
+      if (post.Likes?.find((ele) => Number(ele.user_id) === Number(user_id))) {
+        setLike(<span className='like' onClick={() => unlikePost(post.Likes?.length)}><FcLike />Like</span>);
+        setLn(<span>You and {post.Likes?.length - 1} others like this post</span>);
+      } else {
+        setLike(<span className='like' onClick={() => likePost(post.Likes?.length)}><AiOutlineHeart />Like</span>);
+        setLn(<span>{post.Likes?.length} like this post</span>);
+      }
     })();
   }, []);
   const deletePost = async (id) => {
@@ -70,6 +81,15 @@ function Post() {
     });
     handleShow();
   }
+  const likePost = async (len) => {
+    console.log(posts);
+    setLike(<span className='like' onClick={() => unlikePost(len + 1)}><FcLike />Like</span>);
+    setLn(<span>You and {len} others like this post</span>);
+  }
+  const unlikePost = async (len) => {
+    setLike(<span className='like' onClick={() => likePost(len - 1)}><AiOutlineHeart />Like</span>);
+    setLn(<span>{len - 1} like this post</span>);
+  }
   return (
     <>
       <Navigation />
@@ -79,6 +99,9 @@ function Post() {
       <Button variant='secondary' href='/home'>All Posts</Button>
       {buttons}
       <p>{posts.body}</p>
+      <p>{ln}</p>
+      <hr />
+      {like}
       <DiscardModal show={show} obj={obj} deletePost={deletePost} />
     </>
   )
