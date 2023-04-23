@@ -102,7 +102,24 @@ const getPost = async (req, res) => {
         console.log(req.body);
         const post = await db.Posts.findOne({
             include: [{
+                model: db.User,
+                attributes: ['id', 'fullname']
+            }, {
                 model: db.Likes
+            }, {
+                model: db.Comments,
+                include: [{
+                    model: db.User,
+                    attributes: ['id', 'fullname']
+                }, {
+                    model: db.Replies,
+                    include: [{
+                        model: db.User,
+                        attributes: ['id', 'fullname']
+                    }],
+                    order: [['createdAt', 'DESC']]
+                }],
+                order: [['createdAt', 'DESC']]
             }],
             where: { id },
             order: [['updatedAt', 'DESC']]

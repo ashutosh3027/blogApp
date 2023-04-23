@@ -5,6 +5,7 @@ import { FcLike } from 'react-icons/fc'
 import { AiOutlineHeart } from 'react-icons/ai'
 import { BiCommentDetail, BiShare } from 'react-icons/bi'
 import likeServices from '../services/likeServices'
+import CommentModal from './CommentModal'
 import '../Styles/post.css'
 
 function PostCardComponent(props) {
@@ -14,6 +15,9 @@ function PostCardComponent(props) {
     const [like, setLike] = useState(<></>)
     const [ln, setLn] = useState(<></>);
     const [cn, setCn] = useState(<></>);
+    const [show, setShow] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     useEffect(() => {
         if (props.isUser) {
             setButtons(<>
@@ -61,11 +65,12 @@ function PostCardComponent(props) {
                     <hr />
                     <p className='likes-comments'>
                         {like}
-                        <span className='comment'><BiCommentDetail />Comment</span>
+                        <span className='comment' onClick={handleShow}><BiCommentDetail />Comment</span>
                         <span className='share'><BiShare />Share</span>
                     </p>
                 </footer>
             </Card.Body>
+            <CommentModal show={show} close={handleClose} comments={props.post.Comments} user={props.post.User.fullname} />
         </Card>
     )
 }

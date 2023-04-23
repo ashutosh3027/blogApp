@@ -1,7 +1,7 @@
-.like,.comment,.share{
+.like,.comment,.share,.user,.reply{
     cursor: pointer;
 }
-.like:hover,.comment:hover,.share:hover{
+.like:hover,.comment:hover,.share:hover,.user:hover,.reply:hover{
     background-color: rgb(216, 216, 216);
 }
 .likes-comments{
