@@ -57,8 +57,22 @@ const getAllPost = async (req, res) => {
             include: [{
                 model: db.User,
                 attributes: ['id', 'fullname']
-            },{
+            }, {
                 model: db.Likes
+            }, {
+                model: db.Comments,
+                include: [{
+                    model: db.User,
+                    attributes: ['id', 'fullname']
+                }, {
+                    model: db.Replies,
+                    include: [{
+                        model: db.User,
+                        attributes: ['id', 'fullname']
+                    }],
+                    order: [['createdAt', 'DESC']]
+                }],
+                order: [['createdAt', 'DESC']]
             }],
             where: {
                 user_id: {
@@ -139,7 +153,7 @@ const getPostsById = async (req, res) => {
         const { id } = req.params;
         let check = Number(id) !== req.body.user.id;
         // console.log("🔥🔥🔥🔥🔥🔥🔥🔥🔥",id !== req.body.user.id,typeof id, typeof req.body.user.id,check)
-        if(check){
+        if (check) {
             check = await db.Follows.findOne({
                 where: { user_id_follow: req.body.user.id, user_id_following: id }
             });
@@ -149,8 +163,22 @@ const getPostsById = async (req, res) => {
                 include: [{
                     model: db.User,
                     attributes: ['id', 'fullname']
-                },{
+                }, {
                     model: db.Likes
+                }, {
+                    model: db.Comments,
+                    include: [{
+                        model: db.User,
+                        attributes: ['id', 'fullname']
+                    }, {
+                        model: db.Replies,
+                        include: [{
+                            model: db.User,
+                            attributes: ['id', 'fullname']
+                        }],
+                        order: [['createdAt', 'DESC']]
+                    }],
+                    order: [['createdAt', 'DESC']]
                 }],
                 where: {
                     user_id: id
@@ -162,7 +190,7 @@ const getPostsById = async (req, res) => {
                 posts,
                 user_id: req.body.user.id
             });
-        }else{
+        } else {
             return res.status(404).json({
                 status: 'user not authorized',
             });

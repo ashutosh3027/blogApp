@@ -1,6 +1,10 @@
-.like{
+.like,.comment,.share{
     cursor: pointer;
 }
-.like:hover{
+.like:hover,.comment:hover,.share:hover{
     background-color: rgb(216, 216, 216);
+}
+.likes-comments{
+    display: flex;
+    justify-content: space-between;
 }
