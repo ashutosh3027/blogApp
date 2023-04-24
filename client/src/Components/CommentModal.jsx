@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Modal, Form, InputGroup, Button } from 'react-bootstrap'
 import moment from 'moment';
 import { BsReply, BsSend } from 'react-icons/bs'
@@ -12,8 +12,23 @@ function CommentModal(props) {
     const navigate = useNavigate();
     const [f, setF] = useState(false);
     const [show, setShow] = useState(false);
+    const [moreC, setMoreC] = useState(<></>);
+    const [moreCn, setMoreCn] = useState(5);
+    const [comments, setComments] = useState([...props?.comments]);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    useEffect(() => {
+        if (comments.length > moreCn) {
+            setMoreC(<span className='d-block d-flex justify-content-between'>
+                <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
+                <span className='text-muted'>{moreCn} of {props?.comments?.length}</span>
+            </span>);
+        }
+        if (moreCn >= comments?.length) setMoreC(<></>);
+    }, [moreCn]);
+    useEffect(() => {
+        setComments(comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))); // Desc Order
+    },[]);
     const closeModal = () => {
         console.log("Hello", f);
         if (f) handleShow();
@@ -39,7 +54,7 @@ function CommentModal(props) {
                 <Modal.Title>{props.user}'s Post Comments</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {props?.comments?.map((el) => {
+                {comments.slice(0, moreCn).map((el) => {
                     return (
                         <div key={el.id} className='container-sm'>
                             <span><b className='user' onClick={() => navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</b></span><br />
@@ -48,6 +63,7 @@ function CommentModal(props) {
                         </div>
                     )
                 })}
+                {moreC}
             </Modal.Body>
             <Modal.Footer className='justify-content-start'>
                 <Form onSubmit={newComment} className='w-100'>
