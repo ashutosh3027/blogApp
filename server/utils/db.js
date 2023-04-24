@@ -80,7 +80,7 @@ const initialize = async () => {
             targetKey: 'id'
         });
         Posts.hasMany(Comments, {
-            foreignKey: 'user_id',
+            foreignKey: 'post_id',
             sourceKey: 'id'
         });
         Comments.belongsTo(Posts, {

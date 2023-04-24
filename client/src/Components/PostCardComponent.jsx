@@ -70,7 +70,7 @@ function PostCardComponent(props) {
                     </p>
                 </footer>
             </Card.Body>
-            <CommentModal show={show} close={handleClose} comments={props.post.Comments} user={props.post.User.fullname} />
+            <CommentModal show={show} close={handleClose} comments={props.post.Comments} user={props.post.User.fullname} post_id={props.post.id} />
         </Card>
     )
 }

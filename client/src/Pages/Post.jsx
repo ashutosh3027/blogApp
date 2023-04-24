@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Navigation from '../Components/Navigation'
 import { useParams } from 'react-router-dom'
-import { Button } from 'react-bootstrap';
+import { Button, Form, InputGroup } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import postServices from '../services/postServices';
 import { useNavigate } from 'react-router-dom';
@@ -9,15 +9,23 @@ import Cookies from 'js-cookie';
 import DiscardModal from '../Components/DiscardModal';
 import { FcLike } from 'react-icons/fc'
 import { AiOutlineHeart } from 'react-icons/ai'
+import { BiCommentDetail, BiShare } from 'react-icons/bi'
+import { BsReply, BsSend } from 'react-icons/bs'
 import likeServices from '../services/likeServices';
+import commentServices from '../services/commentServices';
+import moment from 'moment';
+import '../Styles/post.css'
 
 function Post() {
+  moment().format();
   const [posts, setPosts] = useState({});
   const [obj, setObj] = useState({});
   const [show, setShow] = useState(false);
+  const [f, setF] = useState(false);
   const [buttons, setButtons] = useState(<></>);
   const [like, setLike] = useState(<></>)
   const [ln, setLn] = useState(<></>);
+  const [cn, setCn] = useState(<></>);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const { id } = useParams();
@@ -41,6 +49,7 @@ function Post() {
         setLike(<span className='like' onClick={() => likePost(post.Likes?.length, post.id)}><AiOutlineHeart />Like</span>);
         setLn(<span>{post.Likes?.length} like this post</span>);
       }
+      setCn(<span>{post.Comments?.length} Comments</span>)
     })();
   }, []);
   const deletePost = async (id) => {
@@ -94,6 +103,15 @@ function Post() {
     setLike(<span className='like' onClick={() => likePost(len - 1, id)}><AiOutlineHeart />Like</span>);
     setLn(<span>{len - 1} like this post</span>);
   }
+  const newComment = async (event) => {
+    event.preventDefault(); setF(false);
+    const message = event.target.comment.value;
+    const post_id = posts.id;
+    console.log(message, post_id);
+    event.target.comment.value = "";
+    const data = await commentServices.newComment(message, post_id);
+    console.log(data);
+  }
   return (
     <>
       <Navigation />
@@ -103,9 +121,36 @@ function Post() {
       <Button variant='secondary' href='/home'>All Posts</Button>
       {buttons}
       <p>{posts.body}</p>
-      <p>{ln}</p>
+      <p className='likes-comments'>
+        {ln}
+        {cn}
+      </p>
       <hr />
-      {like}
+      <p className='likes-comments'>
+        {like}
+        <span className='comment'><BiCommentDetail />Comment</span>
+        <span className='share'><BiShare />Share</span>
+      </p>
+      <hr />
+      <Form onSubmit={newComment} className='w-100'>
+        <Form.Group controlId='comment'>
+          <InputGroup>
+            <Form.Control onInput={() => setF(true)} placeholder='Write a new comment here' />
+            <Button variant="outline-secondary" id="button-addon2" type='submit'><BsSend /></Button>
+          </InputGroup>
+        </Form.Group>
+      </Form>
+      <div className='container-sm'>
+        {posts?.Comments?.map((el) => {
+          return (
+            <div key={el.id} className='container-sm'>
+              <span><b className='user' onClick={() => navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</b></span><br />
+              <span className='text-muted'>{moment(new Date(el.createdAt)).fromNow()}</span>
+              <p>{el.message}<br /><span className='reply'><BsReply />Reply</span></p>
+            </div>
+          )
+        })}
+      </div>
       <DiscardModal show={show} obj={obj} deletePost={deletePost} />
     </>
   )

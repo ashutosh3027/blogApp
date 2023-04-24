@@ -4,6 +4,7 @@ import moment from 'moment';
 import { BsReply, BsSend } from 'react-icons/bs'
 import { useNavigate } from 'react-router-dom';
 import commentServices from '../services/commentServices';
+import CommentModalLeave from './CommentModalLeave';
 import '../Styles/post.css'
 
 function CommentModal(props) {
@@ -19,12 +20,21 @@ function CommentModal(props) {
         else props.close();
     }
     const newComment = async (event) => {
-        event.preventDefault();
-        console.log(event.target.comment.value);
+        event.preventDefault(); setF(false)
+        const message = event.target.comment.value;
+        const post_id = props.post_id;
+        console.log(message, post_id);
         event.target.comment.value = "";
+        const data = await commentServices.newComment(message, post_id);
+        console.log(data);
+    }
+    const close1 = () => {
+        setF(false);
+        handleClose();
+        props.close();
     }
     return (
-        <Modal show={props.show} onHide={(e) => closeModal(e)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
+        <Modal show={props.show} onHide={(e) => closeModal(e)} size="lg" aria-labelledby="contained-modal-title-vcenter" centered scrollable={true}>
             <Modal.Header closeButton>
                 <Modal.Title>{props.user}'s Post Comments</Modal.Title>
             </Modal.Header>
@@ -38,16 +48,6 @@ function CommentModal(props) {
                         </div>
                     )
                 })}
-                <div className='container-sm'>
-                    <span><b className='user'>Mallik Prabhanjan</b></span><br />
-                    <span className='text-muted'>{moment(Date.now()).fromNow()}</span>
-                    <p>Message<br /><span className='reply'><BsReply />Reply</span></p>
-                </div>
-                <div className='container-sm'>
-                    <span><b className='user'>Mallik Prabhanjan</b></span><br />
-                    <span className='text-muted'>{moment(Date.now()).fromNow()}</span>
-                    <p>Message<br /><span className='reply'><BsReply />Reply</span></p>
-                </div>
             </Modal.Body>
             <Modal.Footer className='justify-content-start'>
                 <Form onSubmit={newComment} className='w-100'>
@@ -59,16 +59,7 @@ function CommentModal(props) {
                     </Form.Group>
                 </Form>
             </Modal.Footer>
-            <Modal show={show} onHide={handleClose} backdrop="static" keyboard={false} aria-labelledby="contained-modal-title-vcenter" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Leave Page?</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>You haven't finished your comment yet. Do you want to leave without finishing?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant='secondary' onClick={handleClose}>Stay on Page</Button>
-                    <Button variant='primary' onClick={() => { setF(false); handleClose(); props.close(); }}>Leave Page</Button>
-                </Modal.Footer>
-            </Modal>
+            <CommentModalLeave show={show} handleClose={handleClose} close1={close1} />
         </Modal>
     )
 }
