@@ -19,11 +19,14 @@ import '../Styles/post.css'
 function Post() {
   moment().format();
   const [posts, setPosts] = useState({});
+  const [userId, setUserId] = useState();
   const [comments, setComments] = useState([]);
   const [obj, setObj] = useState({});
   const [show, setShow] = useState(false);
   const [f, setF] = useState(false);
   const [buttons, setButtons] = useState(<></>);
+  const [likesArray, setLikes] = useState([]);
+  const [type, setType] = useState("");
   const [like, setLike] = useState(<></>)
   const [ln, setLn] = useState(<></>);
   const [cn, setCn] = useState(<></>);
@@ -41,37 +44,66 @@ function Post() {
       console.log(post)
       if (!post) navigate("/*");
       setPosts(post);
+      setUserId(Number(user_id));
       // setComments([post.Comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       if (user_id === post.user_id) setButtons(<>
         <Button variant='info' href={'/edit/' + id}>Edit</Button>
         <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
       </>);
-      if (post.Likes?.find((ele) => Number(ele.user_id) === Number(user_id))) {
-        setLike(<span className='like' onClick={() => unlikePost(post.Likes?.length, post.id)}><FcLike />Like</span>);
-        setLn(<span>You and {post.Likes?.length - 1} others like this post</span>);
-      } else {
-        setLike(<span className='like' onClick={() => likePost(post.Likes?.length, post.id)}><AiOutlineHeart />Like</span>);
-        setLn(<span>{post.Likes?.length} like this post</span>);
+      const { likes } = await likeServices.get(post.id);
+      console.log(likes);
+      setLikes(likes);
+      if (likes?.find((ele) => Number(ele.user_id) === Number(user_id))) {
+        setLike(<span className='like' onClick={() => setType("unlike")}><FcLike />Like</span>);
+        setLn(<span>You and {likes?.length - 1} others like this post</span>);
+      }
+      else {
+        setLike(<span className='like' onClick={() => setType("like")}><AiOutlineHeart />Like</span>);
+        setLn(<span>{likes?.length} like this post</span>);
       }
       setCn(<span>{post.Comments?.length} Comments</span>);
       if (posts?.Comments?.length > moreCn) {
         setMoreC(<span className='d-block d-flex justify-content-between'>
-            <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
-            <span className='text-muted'>{moreCn} of {posts?.Comments?.length}</span>
+          <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
+          <span className='text-muted'>{moreCn} of {posts?.Comments?.length}</span>
         </span>);
-    }
-    if (moreCn >= posts?.Comments?.length) setMoreC(<></>);
+      }
+      if (moreCn >= posts?.Comments?.length) setMoreC(<></>);
     })();
   }, []);
   useEffect(() => {
+    (async () => {
+      if (type === "like") {
+        let likes = likesArray;
+        const { newlike } = await likeServices.like(posts.id);
+        likes.unshift(newlike);
+        setLike(<span className='like' onClick={() => setType("unlike")}><FcLike />Like</span>);
+        setLn(<span>You and {likes?.length - 1} others like this post</span>);
+        setLikes(likes);
+      } else if (type === "unlike") {
+        let likes = likesArray;
+        const data = await likeServices.unlike(posts.id);
+        console.log(data);
+        function removeObj(value, index, arr) {
+          if (Number(value.user_id) === userId) return false;
+          return true;
+        }
+        likes = likes.filter(removeObj);
+        setLike(<span className='like' onClick={() => setType("like")}><AiOutlineHeart />Like</span>);
+        setLn(<span>{likes?.length} like this post</span>);
+        setLikes(likes);
+      }
+    })();
+  }, [type]);
+  useEffect(() => {
     if (posts?.Comments?.length > moreCn) {
-        setMoreC(<span className='d-block d-flex justify-content-between'>
-            <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
-            <span className='text-muted'>{moreCn} of {posts?.Comments?.length}</span>
-        </span>);
+      setMoreC(<span className='d-block d-flex justify-content-between'>
+        <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
+        <span className='text-muted'>{moreCn} of {posts?.Comments?.length}</span>
+      </span>);
     }
     if (moreCn >= posts?.Comments?.length) setMoreC(<></>);
-}, [moreCn]);
+  }, [moreCn]);
   const deletePost = async (id) => {
     try {
       await postServices.deletePost(id);
@@ -111,18 +143,6 @@ function Post() {
     });
     handleShow();
   }
-  const likePost = async (len, id) => {
-    const data = await likeServices.like(id);
-    console.log(data);
-    setLike(<span className='like' onClick={() => unlikePost(len + 1, id)}><FcLike />Like</span>);
-    setLn(<span>You and {len} others like this post</span>);
-  }
-  const unlikePost = async (len, id) => {
-    const data = await likeServices.unlike(id);
-    console.log(data);
-    setLike(<span className='like' onClick={() => likePost(len - 1, id)}><AiOutlineHeart />Like</span>);
-    setLn(<span>{len - 1} like this post</span>);
-  }
   const newComment = async (event) => {
     event.preventDefault(); setF(false);
     const message = event.target.comment.value;
@@ -161,7 +181,7 @@ function Post() {
         </Form.Group>
       </Form>
       <div className='container-sm'>
-        {posts?.Comments?.slice(0,moreCn).map((el) => {
+        {posts?.Comments?.slice(0, moreCn).map((el) => {
           return (
             <div key={el.id} className='container-sm'>
               <span><b className='user' onClick={() => navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</b></span><br />

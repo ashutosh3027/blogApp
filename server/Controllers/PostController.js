@@ -105,8 +105,6 @@ const getPost = async (req, res) => {
                 model: db.User,
                 attributes: ['id', 'fullname']
             }, {
-                model: db.Likes
-            }, {
                 model: db.Comments,
                 include: [{
                     model: db.User,
