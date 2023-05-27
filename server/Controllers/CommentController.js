@@ -10,8 +10,16 @@ const newComment = async (req,res)=>{
                 stauts: 'invalid post_id',
             });
         }
-        const newcomment = await db.Comments.create({
+        const newcom = await db.Comments.create({
             message,user_id,post_id
+        });
+        const newcomment = await db.Comments.findOne({
+            include: [{
+                model: db.User,
+                attributes: ['id', 'fullname']
+            }],
+            where: { id: newcom.id },
+            order: [['updatedAt', 'DESC']]
         });
         res.status(200).json({
             stauts: 'success, new comment created',
@@ -49,16 +57,36 @@ const editComment = async (req,res)=>{
 
 const getAllComments = async (req, res) => {
     try {
-        const {post_id} = req.body;
-        const comments = await db.Comments.findAll({
-            where: { post_id },
-            order: [['updatedAt', 'DESC']]
+        const { post_id } = req.params;
+        const user_id = req.body.user.id;
+        const post_user_id = await db.Posts.findOne({
+            where: { id: post_id },
+            attributes: ['user_id']
         });
-        console.log(comments);
-        return res.status(200).json({
-            status: 'success, comments found',
-            comments
+        const check = await db.Follows.findOne({
+            where: {
+                user_id_follow: user_id,
+                user_id_following: post_user_id.user_id
+            }
         });
+        if (check || Number(user_id) === Number(post_user_id.user_id)) {
+            const comments = await db.Comments.findAll({
+                include: [{
+                    model: db.User,
+                    attributes: ['id', 'fullname']
+                }],
+                where: { post_id },
+                order: [['updatedAt', 'DESC']]
+            });
+            return res.status(200).json({
+                status: 'success, comments found',
+                comments
+            });
+        } else {
+            return res.status(404).json({
+                status: "User not authorized"
+            });
+        }
     } catch (err) {
         console.log(err);
         return res.status(404).json({

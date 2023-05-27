@@ -14,21 +14,38 @@ function CommentModal(props) {
     const [show, setShow] = useState(false);
     const [moreC, setMoreC] = useState(<></>);
     const [moreCn, setMoreCn] = useState(5);
-    const [comments, setComments] = useState([...props?.comments]);
+    const [comments, setComments] = useState([]);
+    const [newc, setNewc] = useState("empty");
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     useEffect(() => {
-        if (comments.length > moreCn) {
-            setMoreC(<span className='d-block d-flex justify-content-between'>
-                <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
-                <span className='text-muted'>{moreCn} of {props?.comments?.length}</span>
-            </span>);
+        if(props.show === true){
+            (async () => {
+                const data = await commentServices.get(props.post_id);
+                setComments(data.comments);
+                setMoreCn(Math.min(data.comments.length,5));
+            })();
         }
-        if (moreCn >= comments?.length) setMoreC(<></>);
-    }, [moreCn]);
+    },[props.show]);
     useEffect(() => {
-        setComments(comments.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))); // Desc Order
-    },[]);
+        console.log("Hello",comments.length);
+        if(comments.length>0){
+            if (comments.length > moreCn) {
+                setMoreC(<span className='d-block d-flex justify-content-between'>
+                    <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
+                    <span className='text-muted'>{moreCn} of {comments?.length}</span>
+                </span>);
+            }
+            if (moreCn >= comments?.length) setMoreC(<span className='d-flex justify-content-end'><span className='text-muted'>{comments?.length} of {comments?.length}</span></span>);
+        }
+        else setMoreC(<h1>No Comments. Be the first to comment</h1>)
+        if(newc !== "empty"){
+            const len = comments.length;
+            setComments([newc,...comments]);
+            setMoreCn(moreCn+1);
+            setNewc("empty");
+        }
+    }, [moreCn,comments,newc]);
     const closeModal = () => {
         console.log("Hello", f);
         if (f) handleShow();
@@ -42,6 +59,7 @@ function CommentModal(props) {
         event.target.comment.value = "";
         const data = await commentServices.newComment(message, post_id);
         console.log(data);
+        setNewc(data.newcomment);
     }
     const close1 = () => {
         setF(false);
@@ -54,7 +72,7 @@ function CommentModal(props) {
                 <Modal.Title>{props.user}'s Post Comments</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {comments.slice(0, moreCn).map((el) => {
+                {comments?.slice(0, moreCn).map((el) => {
                     return (
                         <div key={el.id} className='container-sm'>
                             <span><b className='user' onClick={() => navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</b></span><br />

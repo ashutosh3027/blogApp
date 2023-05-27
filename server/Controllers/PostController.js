@@ -104,20 +104,6 @@ const getPost = async (req, res) => {
             include: [{
                 model: db.User,
                 attributes: ['id', 'fullname']
-            }, {
-                model: db.Comments,
-                include: [{
-                    model: db.User,
-                    attributes: ['id', 'fullname']
-                }, {
-                    model: db.Replies,
-                    include: [{
-                        model: db.User,
-                        attributes: ['id', 'fullname']
-                    }],
-                    order: [['createdAt', 'DESC']]
-                }],
-                order: [['createdAt', 'DESC']]
             }],
             where: { id },
             order: [['updatedAt', 'DESC']]

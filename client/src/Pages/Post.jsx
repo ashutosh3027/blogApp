@@ -30,6 +30,7 @@ function Post() {
   const [like, setLike] = useState(<></>)
   const [ln, setLn] = useState(<></>);
   const [cn, setCn] = useState(<></>);
+  const [newc, setNewc] = useState("empty");
   const [moreC, setMoreC] = useState(<></>);
   const [moreCn, setMoreCn] = useState(5);
   const handleClose = () => setShow(false);
@@ -45,7 +46,6 @@ function Post() {
       if (!post) navigate("/*");
       setPosts(post);
       setUserId(Number(user_id));
-      // setComments([post.Comments].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       if (user_id === post.user_id) setButtons(<>
         <Button variant='info' href={'/edit/' + id}>Edit</Button>
         <Button variant='danger' onClick={() => deleteModal(id)}>Delete</Button>
@@ -61,14 +61,10 @@ function Post() {
         setLike(<span className='like' onClick={() => setType("like")}><AiOutlineHeart />Like</span>);
         setLn(<span>{likes?.length} like this post</span>);
       }
-      setCn(<span>{post.Comments?.length} Comments</span>);
-      if (posts?.Comments?.length > moreCn) {
-        setMoreC(<span className='d-block d-flex justify-content-between'>
-          <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
-          <span className='text-muted'>{moreCn} of {posts?.Comments?.length}</span>
-        </span>);
-      }
-      if (moreCn >= posts?.Comments?.length) setMoreC(<></>);
+      const data = await commentServices.get(post.id);
+      setCn(<span>{data?.comments?.length} Comments</span>);
+      setComments(data.comments);
+      setMoreCn(Math.min(data.comments.length, 5));
     })();
   }, []);
   useEffect(() => {
@@ -96,14 +92,25 @@ function Post() {
     })();
   }, [type]);
   useEffect(() => {
-    if (posts?.Comments?.length > moreCn) {
-      setMoreC(<span className='d-block d-flex justify-content-between'>
-        <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
-        <span className='text-muted'>{moreCn} of {posts?.Comments?.length}</span>
-      </span>);
+    console.log("Hello", comments.length);
+    if (comments.length > 0) {
+      if (comments.length > moreCn) {
+        setMoreC(<span className='d-block d-flex justify-content-between'>
+          <span className='more-comments text-muted' onClick={() => setMoreCn(moreCn + 5)}><b><u>More Comments</u></b></span>
+          <span className='text-muted'>{moreCn} of {comments?.length}</span>
+        </span>);
+      }
+      if (moreCn >= comments?.length) setMoreC(<span className='d-flex justify-content-end'><span className='text-muted'>{comments?.length} of {comments?.length}</span></span>);
     }
-    if (moreCn >= posts?.Comments?.length) setMoreC(<></>);
-  }, [moreCn]);
+    else setMoreC(<h1>No Comments. Be the first to comment</h1>)
+    if (newc !== "empty") {
+      const len = comments.length;
+      setCn(<span>{len + 1} Comments</span>);
+      setComments([newc, ...comments]);
+      setMoreCn(moreCn + 1);
+      setNewc("empty");
+    }
+  }, [moreCn, comments, newc]);
   const deletePost = async (id) => {
     try {
       await postServices.deletePost(id);
@@ -151,6 +158,7 @@ function Post() {
     event.target.comment.value = "";
     const data = await commentServices.newComment(message, post_id);
     console.log(data);
+    setNewc(data.newcomment);
   }
   return (
     <>
@@ -181,7 +189,7 @@ function Post() {
         </Form.Group>
       </Form>
       <div className='container-sm'>
-        {posts?.Comments?.slice(0, moreCn).map((el) => {
+        {comments?.slice(0, moreCn).map((el) => {
           return (
             <div key={el.id} className='container-sm'>
               <span><b className='user' onClick={() => navigate(`/profile/${el.User.id}`)}>{el.User.fullname}</b></span><br />

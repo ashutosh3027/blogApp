@@ -3,6 +3,6 @@ const {newComment,editComment,getAllComments} = require('../Controllers/CommentC
 
 router.route('/new').post(newComment);
 router.route('/edit').put(editComment);
-router.route('/get').get(getAllComments);
+router.route('/get/:post_id').get(getAllComments);
 
 module.exports = router;
