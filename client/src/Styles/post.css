@@ -8,3 +8,9 @@
     display: flex;
     justify-content: space-between;
 }
+.reply-container{
+    margin-left: 5%;
+}
+.reply-down{
+    color: blue;
+}

@@ -7,7 +7,7 @@ function CommentModalLeave(props) {
             <Modal.Header closeButton>
                 <Modal.Title>Leave Page?</Modal.Title>
             </Modal.Header>
-            <Modal.Body>You haven't finished your comment yet. Do you want to leave without finishing?</Modal.Body>
+            <Modal.Body>Are you sure you want to leave? Your unfinished changes will be discarded.</Modal.Body>
             <Modal.Footer>
                 <Button variant='secondary' onClick={props.handleClose}>Stay on Page</Button>
                 <Button variant='primary' onClick={props.close1}>Leave Page</Button>
