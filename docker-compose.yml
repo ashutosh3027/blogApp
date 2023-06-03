@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  client:
+    image: client
+    restart: unless-stopped
+    container_name: client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - server
+  server:
+    image: server
+    restart: always
+    container_name: server
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+    depends_on:
+      - database
+  database:
+    image: mysql
+    restart: always
+    container_name: database
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=indigoleague
+    volumes:
+      - mysql:/var/lib/mysql
+volumes:
+  mysql:
+    driver: local
